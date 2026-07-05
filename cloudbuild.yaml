@@ -30,6 +30,8 @@ steps:
       - --allow-unauthenticated
       - --port
       - "8080"
+      - --set-secrets
+      - PULSEFEED_ACCESS_CODE=pulsefeed-access-code:latest
       - --quiet
 
 images:

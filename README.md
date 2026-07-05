@@ -111,4 +111,4 @@ Deploy the entire monorepo with one click on Vercel:
 This repository also includes a Cloud Run-ready container and a `cloudbuild.yaml` pipeline for automated deploys:
 1. Cloud Build builds the Docker image from the repo root.
 2. The container listens on the Cloud Run `PORT` value, so the service can start on `8080` without port mismatches.
-3. Create a Cloud Build trigger on your branch and point it at `cloudbuild.yaml` for CI/CD deploys to the `pulsefeed` service in `asia-south1`.
+3. Store the access code in Secret Manager as `pulsefeed-access-code` and create a Cloud Build trigger on your branch that points at `cloudbuild.yaml` for CI/CD deploys to the `pulsefeed` service in `asia-south1`.
