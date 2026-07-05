@@ -364,10 +364,10 @@ function App() {
                 </aside>
 
                 {/* Right grid */}
-                <div className="flex-1 p-5 flex flex-wrap gap-x-4 gap-y-5 content-start text-left overflow-y-auto">
+                <div className="flex-1 p-5 grid grid-cols-12 gap-4 content-start text-left overflow-y-auto h-full">
                   {/* Card 1 - Beige */}
                   <motion.div
-                    className="w-96 h-60 relative bg-[#D0C9B9] rounded-2xl overflow-hidden p-5 flex flex-col text-[#131113]"
+                    className="col-span-5 h-[190px] relative bg-[#D0C9B9] rounded-2xl overflow-hidden p-5 flex flex-col justify-between text-[#131113]"
                     initial={{ opacity: 0, y: 20 }}
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.18, ease: "easeOut" }}
@@ -400,7 +400,7 @@ function App() {
 
                   {/* Card 2 - Pink */}
                   <motion.div
-                    className="w-36 h-60 relative rounded-2xl overflow-hidden flex flex-col justify-center items-center"
+                    className="col-span-3 h-[190px] relative rounded-2xl overflow-hidden flex flex-col justify-center items-center"
                     initial={{ opacity: 0, y: 20 }}
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.24, ease: "easeOut" }}
@@ -423,64 +423,63 @@ function App() {
 
                   {/* Card 3 - Grounded Sources */}
                   <motion.div
-                    className="w-72 h-60 rounded-2xl border border-white/10 p-6 flex flex-col justify-between text-left select-none"
+                    className="col-span-4 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none"
                     style={{ backgroundColor: "#0F0D0F" }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.3, ease: "easeOut" }}
                   >
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-0.5">
                       <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block">Data Pipeline</span>
-                      <span className="text-xl font-medium text-white block">Grounded Sources</span>
+                      <span className="text-lg font-medium text-white block">Grounded Sources</span>
                     </div>
 
-                    <div className="flex justify-between items-center gap-3 my-2">
+                    <div className="flex justify-between items-center gap-2 my-1">
                       {/* OMDb API */}
-                      <div className="size-16 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-2 text-center">
-                        <span className="text-[10px] text-yellow-500 font-bold uppercase font-mono">OMDb</span>
-                        <span className="text-[8px] text-neutral-400 font-semibold mt-1">Movies</span>
+                      <div className="h-12 flex-1 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-1 text-center">
+                        <span className="text-[9px] text-yellow-500 font-bold uppercase font-mono">OMDb</span>
+                        <span className="text-[7px] text-neutral-400 font-semibold">Movies</span>
                       </div>
                       {/* OpenWeather */}
-                      <div className="size-16 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-2 text-center">
-                        <span className="text-xs text-blue-400 font-bold">☁️</span>
-                        <span className="text-[8px] text-neutral-400 font-semibold mt-0.5">Weather</span>
+                      <div className="h-12 flex-1 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-1 text-center">
+                        <span className="text-xs text-blue-400 font-bold leading-none">☁️</span>
+                        <span className="text-[7px] text-neutral-400 font-semibold mt-0.5">Weather</span>
                       </div>
                       {/* Google Search */}
-                      <div className="size-16 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-2 text-center">
-                        <span className="text-xs text-red-400 font-bold">G</span>
-                        <span className="text-[8px] text-neutral-400 font-semibold mt-0.5">Google</span>
+                      <div className="h-12 flex-1 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-1 text-center">
+                        <span className="text-xs text-red-400 font-bold leading-none">G</span>
+                        <span className="text-[7px] text-neutral-400 font-semibold mt-0.5">Google</span>
                       </div>
                     </div>
 
                     <div className="text-center">
-                      <span className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">+ 4 integrations</span>
+                      <span className="text-[10px] font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">+ 4 integrations</span>
                     </div>
                   </motion.div>
 
                   {/* Card 4 - Live Monitor */}
                   <motion.div
-                    className="w-72 h-60 rounded-2xl border border-white/10 p-6 flex flex-col justify-between text-left -mt-[56px] select-none"
+                    className="col-span-4 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none"
                     style={{ backgroundColor: "#0F0D0F" }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.36, ease: "easeOut" }}
                   >
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-0.5">
                       <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block">Live Stream</span>
-                      <span className="text-xl font-medium text-white block">Queries Run</span>
+                      <span className="text-lg font-medium text-white block">Queries Run</span>
                     </div>
 
-                    <div className="flex flex-col gap-2 font-mono text-[9px] leading-normal text-neutral-300 bg-black/40 border border-white/5 p-3 rounded-xl h-24 overflow-hidden">
+                    <div className="flex flex-col gap-1.5 font-mono text-[8px] leading-normal text-neutral-300 bg-black/40 border border-white/5 p-2.5 rounded-xl h-18 overflow-hidden my-1">
                       <div className="flex justify-between border-b border-white/5 pb-1">
                         <span className="text-green-400">GET /api/search</span>
                         <span className="text-neutral-500">200 OK</span>
                       </div>
                       <div className="text-neutral-400 truncate">&gt; query: "iPhone vs Galaxy prices"</div>
-                      <div className="text-neutral-500 truncate">&gt; confidence: High</div>
                       <div className="text-neutral-500 truncate">&gt; chart: comparison_bar</div>
                     </div>
 
-                    <div className="flex justify-between items-center text-xs opacity-40">
+                    <div className="flex justify-between items-center text-[10px] opacity-40">
                       <span>Status: Listening</span>
                       <span className="size-2 rounded-full bg-green-500 animate-pulse"></span>
                     </div>
@@ -488,46 +487,46 @@ function App() {
 
                   {/* Card 5 - Visualization Engine */}
                   <motion.div
-                    className="w-[555px] h-60 rounded-2xl border border-white/10 p-6 flex flex-col justify-between text-left -mt-[56px] select-none"
+                    className="col-span-8 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none"
                     style={{ backgroundColor: "#0F0D0F" }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.42, ease: "easeOut" }}
                   >
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-0.5">
                       <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block">Visualization Engine</span>
-                      <span className="text-xl font-medium text-white block">Raw Data to Instant Chart</span>
+                      <span className="text-lg font-medium text-white block">Raw Data to Instant Chart</span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-6 my-2 items-center">
+                    <div className="grid grid-cols-3 gap-4 my-1 items-center">
                       {/* Left: Input */}
-                      <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex flex-col gap-1.5 h-[84px] justify-center">
-                        <span className="text-[9px] uppercase tracking-wider text-neutral-400 font-semibold">User Search</span>
-                        <p className="text-[11px] text-white leading-normal font-medium italic">"Compare London vs Tokyo temps"</p>
+                      <div className="bg-white/5 border border-white/10 p-2.5 rounded-xl flex flex-col gap-1 h-[68px] justify-center">
+                        <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold">User Search</span>
+                        <p className="text-[10px] text-white leading-tight font-medium italic truncate">"Compare London vs Tokyo temps"</p>
                       </div>
 
                       {/* Middle: AI Parser */}
-                      <div className="flex flex-col items-center justify-center gap-1.5 h-[84px]">
-                        <span className="text-[9px] uppercase tracking-wider text-neutral-400 font-semibold">Gemini Parser</span>
-                        <svg className="w-6 h-6 text-neutral-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <div className="flex flex-col items-center justify-center gap-1 h-[68px]">
+                        <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold">Gemini Parser</span>
+                        <svg className="w-4 h-4 text-neutral-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
-                        <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded">Grounded API</span>
+                        <span className="text-[8px] bg-blue-500/10 text-blue-400 border border-blue-500/25 px-1.5 py-0.5 rounded leading-none">Grounded API</span>
                       </div>
 
                       {/* Right: Output Chart */}
-                      <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex flex-col gap-2 h-[84px] justify-center text-xs">
-                        <span className="text-[9px] uppercase tracking-wider text-neutral-400 font-semibold">CSS Chart Output</span>
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className="w-10 text-[9px] text-neutral-400 font-mono">London</span>
-                            <div className="h-2 bg-blue-500 rounded-full" style={{ width: "40%" }} />
-                            <span className="text-[9px] text-white">18°C</span>
+                      <div className="bg-white/5 border border-white/10 p-2.5 rounded-xl flex flex-col gap-1 h-[68px] justify-center text-[10px]">
+                        <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold">CSS Chart Output</span>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-8 text-[8px] text-neutral-400 font-mono truncate">London</span>
+                            <div className="h-1 bg-blue-500 rounded-full flex-1" style={{ maxWidth: "40%" }} />
+                            <span className="text-[8px] text-white">18°C</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="w-10 text-[9px] text-neutral-400 font-mono">Tokyo</span>
-                            <div className="h-2 bg-green-500 rounded-full" style={{ width: "65%" }} />
-                            <span className="text-[9px] text-white">26°C</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-8 text-[8px] text-neutral-400 font-mono truncate">Tokyo</span>
+                            <div className="h-1 bg-green-500 rounded-full flex-1" style={{ maxWidth: "65%" }} />
+                            <span className="text-[8px] text-white">26°C</span>
                           </div>
                         </div>
                       </div>
