@@ -30,23 +30,56 @@ pulsefeed/
 
 ## Getting Started
 
-1. Copy `.env.example` to `.env` and fill in your API credentials:
+### 1. Setup Environment
+Copy `.env.example` to `.env` and fill in your API credentials:
+```bash
+cp pulsefeed/.env.example pulsefeed/.env
+```
+
+### 2. Backend Installation & Run
+Install python dependencies:
+```bash
+pip install -r pulsefeed/requirements.txt
+```
+
+Run backend connectivity checks:
+```bash
+python pulsefeed/tests/test_firestore.py
+python pulsefeed/tests/test_omdb.py
+python pulsefeed/tests/test_weather.py
+python pulsefeed/tests/test_gemini.py
+python pulsefeed/tests/test_gemini_fallback.py
+```
+
+Start the FastAPI backend server (runs on `http://127.0.0.1:8000`):
+```bash
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
+
+---
+
+### 3. Frontend Selection (React or Streamlit)
+
+#### Option A: Premium React UI (Recommended)
+This features a pixel-perfect, animated dark-mode landing page powered by Vite, Tailwind CSS v4, and Framer Motion. It links directly to the FastAPI server for live search and feed refresh.
+
+1. Navigate to the frontend directory:
    ```bash
-   cp pulsefeed/.env.example pulsefeed/.env
+   cd frontend
    ```
-2. Install dependencies:
+2. Install npm dependencies:
    ```bash
-   pip install -r pulsefeed/requirements.txt
+   npm install
    ```
-3. Run connectivity checks:
+3. Run the development server (runs locally on `http://localhost:5173`):
    ```bash
-   python pulsefeed/tests/test_firestore.py
-   python pulsefeed/tests/test_omdb.py
-   python pulsefeed/tests/test_weather.py
-   python pulsefeed/tests/test_gemini.py
+   npm run dev
    ```
-4. Run pipeline scripts:
-   ```bash
-   # Run all pipelines sequentially
-   python pulsefeed/pipeline/run_all.py
-   ```
+
+#### Option B: Minimalist Streamlit Interface
+A simple, Python-native Streamlit dashboard displaying visual insight grids.
+
+Start the Streamlit application (runs locally on `http://localhost:8501`):
+```bash
+python -m streamlit run app.py --server.headless=true
+```
