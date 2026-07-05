@@ -156,6 +156,7 @@ function App() {
         insight={activeInsight} 
         onClose={() => setShowInsideView(false)} 
         onSearch={handleSearch}
+        onSelectInsight={setActiveInsight}
         isSearching={isSearching}
       />
     );
@@ -1527,139 +1528,36 @@ function StatsSection() {
   );
 }
 
-function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
+function InsideDashboard({ insight, onClose, onSearch, onSelectInsight, isSearching }) {
+  const [activeTab, setActiveTab] = useState("search");
   const [insideSearchQuery, setInsideSearchQuery] = useState("");
+  const [historyList, setHistoryList] = useState([]);
+  const [isFetchingHistory, setIsFetchingHistory] = useState(false);
+  const [activeInterest, setActiveInterest] = useState("All");
 
   const handleInsideSearch = () => {
     if (!insideSearchQuery.trim()) return;
     onSearch(insideSearchQuery.trim());
+    setActiveTab("search");
     setInsideSearchQuery("");
   };
 
-  if (!insight) {
-    return (
-      <div className="flex h-screen w-full bg-black text-[#f5f5f5] font-display antialiased overflow-hidden select-none">
-        
-        {/* Sidebar Navigation */}
-        <aside className="w-60 bg-gradient-to-b from-[#0A090A] to-[#121112] border-r border-white/5 flex flex-col justify-between py-6 px-4.5 z-50 shrink-0 text-left">
-          <div className="flex flex-col gap-9">
-            <div className="flex items-center gap-3 px-1.5">
-              <div className="size-8.5 rounded-xl bg-white/10 flex items-center justify-center border border-white/15">
-                <img src={logoUrl} alt="Logo" width={20} height={20} />
-              </div>
-              <span className="text-lg font-semibold tracking-tight text-white font-display">PulseFeed</span>
-            </div>
+  // Fetch Firestore history list when All Insights tab is active
+  useEffect(() => {
+    if (activeTab === "history") {
+      setIsFetchingHistory(true);
+      fetch("/api/insights")
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data) => {
+          setHistoryList(data);
+          setIsFetchingHistory(false);
+        })
+        .catch(() => setIsFetchingHistory(false));
+    }
+  }, [activeTab]);
 
-            <nav className="flex flex-col gap-1.5">
-              {[
-                { label: "Feed", active: false, icon: "feed", action: onClose },
-                { label: "Filters", active: false, icon: "filter_list" },
-                { label: "Search Insights", active: true, icon: "search" },
-                { label: "All Insights", active: false, icon: "database" },
-              ].map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={item.action}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-left relative ${
-                    item.active 
-                      ? "bg-white/10 text-white border border-white/5 shadow-[0_2px_12px_rgba(255,255,255,0.03)]" 
-                      : "text-neutral-400 hover:text-white hover:bg-white/5 hover:translate-x-0.5"
-                  }`}
-                >
-                  {item.active && (
-                    <span className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-white rounded-r-md" />
-                  )}
-                  <span className="material-symbols-outlined text-[19px] opacity-80">{item.icon}</span>
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          <div className="px-1.5">
-            <button 
-              onClick={onClose}
-              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-3 text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer"
-            >
-              Back to Home
-            </button>
-          </div>
-        </aside>
-
-        {/* Search Main Workspace */}
-        <main className="flex-grow flex flex-col justify-center items-center relative h-full bg-[#070607] px-6">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/3 via-transparent to-transparent pointer-events-none z-0" />
-          
-          <div className="max-w-2xl w-full text-center relative z-10 flex flex-col items-center gap-8">
-            <div className="flex flex-col items-center gap-3">
-              <span className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs font-mono font-semibold uppercase tracking-widest text-neutral-400">
-                PulseFeed Live Workspace
-              </span>
-              <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white leading-tight">
-                Ask about anything.
-              </h2>
-              <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">
-                Enter any query below to run a live Google Search Grounding request or pull structured metrics, directly rendering comparative charts.
-              </p>
-            </div>
-
-            {/* Centered Command search bar */}
-            <div className="w-full relative flex items-center gap-3">
-              <div className="relative flex-grow">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 text-xl">search</span>
-                <input 
-                  type="text" 
-                  placeholder="Query prices, job trends, ratings, comparisons..." 
-                  value={insideSearchQuery}
-                  onChange={(e) => setInsideSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleInsideSearch()}
-                  className="w-full bg-[#111011] border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white/20 transition-all duration-200 shadow-2xl"
-                  autoFocus
-                />
-              </div>
-              <button
-                onClick={handleInsideSearch}
-                disabled={isSearching}
-                className="bg-white hover:bg-neutral-200 text-black text-sm font-semibold px-6 py-4 rounded-2xl transition-all duration-200 disabled:opacity-50 cursor-pointer shrink-0"
-              >
-                {isSearching ? "Searching..." : "Search"}
-              </button>
-            </div>
-
-            {/* Clickable Recommended test prompts */}
-            <div className="flex flex-col items-center gap-3 mt-2">
-              <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase font-mono">Suggested live queries:</span>
-              <div className="flex flex-wrap justify-center gap-2">
-                {[
-                  "React developer salaries in Bangalore",
-                  "Tokyo temperature comparison",
-                  "Oppenheimer box office collections",
-                  "best budget noise cancelling headphones under 3000 rupees"
-                ].map((prompt, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setInsideSearchQuery(prompt);
-                      onSearch(prompt);
-                    }}
-                    disabled={isSearching}
-                    className="bg-white/5 hover:bg-white/8 border border-white/5 px-3 py-2 rounded-xl text-xs text-neutral-300 font-mono transition-all duration-200 hover:border-white/10 cursor-pointer disabled:opacity-50"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  const { query, domain, caption, confidence, chart_type, data_points = [], sources = [] } = insight;
-
-  const confidencePercent = confidence === "high" ? 94 : confidence === "medium" ? 76 : 38;
-  const dataPointsCount = data_points && data_points.length > 0 ? data_points.length : 3;
+  const confidencePercent = insight?.confidence === "high" ? 94 : insight?.confidence === "medium" ? 76 : 38;
+  const dataPointsCount = insight?.data_points && insight?.data_points.length > 0 ? insight.data_points.length : 3;
 
   return (
     <div className="flex h-screen w-full bg-black text-[#f5f5f5] font-display antialiased overflow-hidden select-none">
@@ -1676,21 +1574,20 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
 
           <nav className="flex flex-col gap-1.5">
             {[
-              { label: "Feed", active: false, icon: "feed", action: onClose },
-              { label: "Filters", active: false, icon: "filter_list" },
-              { label: "Search Insights", active: true, icon: "search" },
-              { label: "All Insights", active: false, icon: "database" },
-            ].map((item, idx) => (
+              { label: "Feed", id: "feed", icon: "feed" },
+              { label: "Search Insights", id: "search", icon: "search" },
+              { label: "All Insights", id: "history", icon: "database" },
+            ].map((item) => (
               <button
-                key={idx}
-                onClick={item.action}
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
                 className={`flex items-center gap-3 px-3.5 py-2.5.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-left relative ${
-                  item.active 
+                  activeTab === item.id 
                     ? "bg-white/10 text-white border border-white/5 shadow-[0_2px_12px_rgba(255,255,255,0.03)]" 
                     : "text-neutral-400 hover:text-white hover:bg-white/5 hover:translate-x-0.5"
                 }`}
               >
-                {item.active && (
+                {activeTab === item.id && (
                   <span className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-white rounded-r-md" />
                 )}
                 <span className="material-symbols-outlined text-[19px] opacity-80">{item.icon}</span>
@@ -1703,26 +1600,28 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
         <div className="px-1.5">
           <button 
             onClick={onClose}
-            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-3 text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer hover:shadow-[0_2px_12px_rgba(255,255,255,0.03)]"
+            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-3 text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer"
           >
             Back to Home
           </button>
         </div>
       </aside>
 
-      {/* Main Canvas Dashboard */}
-      <main className="flex-1 flex flex-col relative h-full overflow-hidden bg-[#070607]">
+      {/* Main Content Area */}
+      <main className="flex-grow flex flex-col relative h-full overflow-hidden bg-[#070607]">
         
         {/* Top Header */}
         <header className="h-16 border-b border-white/5 flex justify-between items-center px-8 shrink-0 bg-black/30 backdrop-blur-xl">
           <div className="flex flex-col text-left">
             <span className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 font-semibold leading-none">Internal View</span>
-            <span className="text-sm font-semibold text-white mt-1.5">PulseFeed Interactive Dashboard</span>
+            <span className="text-sm font-semibold text-white mt-1.5">
+              {activeTab === "feed" ? "Live Feed Streams" : activeTab === "history" ? "Insights Repository" : "PulseFeed Interactive Dashboard"}
+            </span>
           </div>
 
           {/* Search bar inside header */}
           <div className="w-[420px] relative flex items-center gap-3">
-            <div className="relative flex-1">
+            <div className="relative flex-grow">
               <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 text-lg">search</span>
               <input 
                 type="text" 
@@ -1743,293 +1642,469 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
           </div>
         </header>
 
-        {/* Bento grid content */}
-        <section className="flex-1 p-6 overflow-y-auto space-y-6">
-          <div className="max-w-7xl mx-auto grid grid-cols-12 gap-5.5">
-            
-            {/* Row 1: Card 1 (Beige), Card 2 (Pink), Card 3 (Grounded Sources) */}
-            
-            {/* Card 1 - Beige */}
-            <div className="col-span-12 md:col-span-5 h-[190px] relative bg-[#D0C9B9] rounded-2xl overflow-hidden p-5.5 flex flex-col justify-between text-[#131113] text-left border border-white/10 shadow-[0_4px_24px_rgba(208,201,185,0.06)]">
-              <div className="flex justify-between relative z-10 items-start">
-                <div className="flex flex-col">
-                  <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Live Insight</span>
-                  <span className="text-3xl font-semibold mt-1 block tracking-tight">1 Generated</span>
+        {/* Scrollable Content View */}
+        <div className="flex-1 overflow-y-auto p-6">
+          
+          {/* TAB 1: Coming Soon Live Feed */}
+          {activeTab === "feed" && (
+            <div className="max-w-4xl mx-auto space-y-8 text-left">
+              <div className="flex flex-col gap-2 border-b border-white/5 pb-6">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-3xl font-semibold tracking-tight text-white">Live News Feed</h3>
+                  <span className="bg-[#6366f1]/10 text-[#6366f1] border border-[#6366f1]/20 text-[9px] font-bold tracking-widest px-2.5 py-1 rounded-md uppercase font-mono">
+                    COMING SOON
+                  </span>
                 </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Confidence</span>
-                  <span className="text-3xl font-semibold mt-1 tracking-tight">{confidencePercent}%</span>
-                </div>
-              </div>
-              
-              {/* Taggings: placed cleanly above the graph to completely avoid overlap */}
-              <div className="flex gap-2 relative z-10 mt-1 mb-8">
-                <span className="bg-[#131113]/8 border border-[#131113]/10 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase">
-                  {domain || "Grounded Query"}
-                </span>
-                <span className="bg-[#131113]/8 border border-[#131113]/10 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase">
-                  {confidence.toUpperCase()} CONFIDENCE
-                </span>
-              </div>
-              
-              <img src={dashLine.url} alt="" className="absolute inset-x-0 bottom-0 w-full h-[65%] object-cover pointer-events-none z-0 opacity-40 mix-blend-multiply" />
-            </div>
-
-            {/* Card 2 - Pink */}
-            <div className="col-span-12 md:col-span-3 h-[190px] relative rounded-2xl overflow-hidden p-5.5 flex flex-col justify-between text-neutral-900 bg-gradient-to-br from-[#F5D6FA] via-[#E8B6EE] to-[#D598DC] text-left border border-white/10 shadow-[0_4px_24px_rgba(228,165,237,0.06)]">
-              <div className="flex flex-col">
-                <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Metrics</span>
-                <span className="text-3xl font-semibold mt-1 tracking-tight">{dataPointsCount}</span>
-              </div>
-              <div className="relative z-10">
-                <span className="text-[10px] font-bold uppercase tracking-wider block">Data points analyzed</span>
-                <span className="text-[9px] opacity-60 block font-mono mt-0.5">Real-time Verification</span>
-              </div>
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/25 via-transparent to-transparent pointer-events-none z-0" />
-            </div>
-
-            {/* Card 3 - Grounded Sources */}
-            <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Data Pipeline</span>
-                <span className="text-lg font-medium text-white block">Grounded Sources</span>
+                <p className="text-neutral-400 text-sm leading-relaxed max-w-xl">
+                  Real-time visual ingestion of global trending events. Filter your streams to track updates dynamically.
+                </p>
               </div>
 
-              <div className="flex justify-between items-center gap-2.5 my-1">
-                {/* OMDb API */}
-                {(() => {
-                  const isActive = sources.some(s => s.toLowerCase().includes("omdb") || s.toLowerCase().includes("movie"));
-                  return (
-                    <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
-                      isActive 
-                        ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
-                        : "bg-white/3 border-white/5 opacity-55"
-                    }`}>
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className={`size-1 rounded-full ${isActive ? "bg-yellow-500 animate-pulse" : "bg-neutral-600"}`} />
-                        <span className="text-[9px] text-yellow-500 font-bold uppercase font-mono tracking-wider">OMDb</span>
+              {/* Area of Interest Filter Buttons inside Feed directly */}
+              <div className="flex flex-wrap gap-2">
+                {["All", "Movies", "Weather", "Technology", "Finance"].map((interest) => (
+                  <button
+                    key={interest}
+                    onClick={() => setActiveInterest(interest)}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                      activeInterest === interest
+                        ? "bg-white text-black shadow-lg"
+                        : "bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white border border-white/5"
+                    }`}
+                  >
+                    {interest === "All" ? "All Area of Interests" : interest}
+                  </button>
+                ))}
+              </div>
+
+              {/* Skeleton Pulse Loading Layout design for premium look */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="border border-white/5 rounded-2xl p-5 bg-gradient-to-b from-[#111011] to-[#0A090A] flex flex-col justify-between min-h-[190px] relative overflow-hidden select-none">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-2.5 w-3/4">
+                        <div className="h-4 bg-white/5 rounded-lg w-5/6 animate-pulse" />
+                        <div className="h-3 bg-white/5 rounded-lg w-1/2 animate-pulse" />
                       </div>
-                      <span className="text-[8px] text-neutral-400 font-medium">Movies</span>
+                      <div className="h-6 bg-[#6366f1]/5 border border-[#6366f1]/10 rounded-md w-16 animate-pulse" />
                     </div>
-                  );
-                })()}
 
-                {/* OpenWeather */}
-                {(() => {
-                  const isActive = sources.some(s => s.toLowerCase().includes("weather") || s.toLowerCase().includes("temp"));
-                  return (
-                    <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
-                      isActive 
-                        ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
-                        : "bg-white/3 border-white/5 opacity-55"
-                    }`}>
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className={`size-1 rounded-full ${isActive ? "bg-blue-400 animate-pulse" : "bg-neutral-600"}`} />
-                        <span className="text-xs text-blue-400 leading-none">☁️</span>
+                    <div className="h-16 bg-white/3 border border-white/5 rounded-xl w-full my-4 animate-pulse flex items-center justify-center">
+                      <span className="text-[10px] text-neutral-600 font-mono tracking-widest uppercase animate-pulse">INGESTING LIVE PACKETS...</span>
+                    </div>
+
+                    <div className="flex justify-between items-center text-[10px] text-neutral-500">
+                      <div className="flex items-center gap-1.5">
+                        <span className="size-1.5 rounded-full bg-[#6366f1] animate-pulse" />
+                        <span className="font-mono">Syncing channel...</span>
                       </div>
-                      <span className="text-[8px] text-neutral-400 font-medium">Weather</span>
+                      <span className="font-mono uppercase tracking-widest text-[#6366f1] font-semibold text-[9px]">coming soon</span>
                     </div>
-                  );
-                })()}
-
-                {/* Google Search */}
-                {(() => {
-                  const isActive = sources.some(s => s.toLowerCase().includes("google") || s.toLowerCase().includes("search") || s.toLowerCase().includes("grounding"));
-                  return (
-                    <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
-                      isActive 
-                        ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
-                        : "bg-white/3 border-white/5 opacity-55"
-                    }`}>
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className={`size-1 rounded-full ${isActive ? "bg-red-400 animate-pulse" : "bg-neutral-600"}`} />
-                        <span className="text-[9px] text-red-400 font-bold uppercase font-mono tracking-wider">Google</span>
-                      </div>
-                      <span className="text-[8px] text-neutral-400 font-medium">Search</span>
-                    </div>
-                  );
-                })()}
-              </div>
-
-              <div className="text-center">
-                <span className="text-[9px] font-mono font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer tracking-wider">+ 4 ACTIVE CONNECTORS</span>
+                  </div>
+                ))}
               </div>
             </div>
+          )}
 
-            {/* Row 2: Card 4 (Queries Run), Card 5 (Visualization Engine / Dynamic Chart) */}
-
-            {/* Card 4 - Live Monitor */}
-            <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
-              <div className="flex justify-between items-start">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Live Stream</span>
-                  <span className="text-lg font-medium text-white block">Queries Run</span>
-                </div>
-                {/* Mac window dots style */}
-                <div className="flex gap-1.5 mt-1">
-                  <div className="size-2 rounded-full bg-red-500/70" />
-                  <div className="size-2 rounded-full bg-yellow-500/70" />
-                  <div className="size-2 rounded-full bg-green-500/70" />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5 font-mono text-[9px] leading-normal text-neutral-300 bg-black/40 border border-white/5 p-3 rounded-xl h-19 overflow-y-auto my-1 select-text">
-                <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-emerald-400">01 GET /api/search</span>
-                  <span className="text-neutral-500">200 OK</span>
-                </div>
-                <div className="text-neutral-400 truncate">02 &gt; query: "{query}"</div>
-                <div className="text-neutral-300 truncate">03 &gt; chart: {chart_type}</div>
-              </div>
-
-              <div className="flex justify-between items-center text-[10px] opacity-40">
-                <span className="font-mono">STATUS: LISTENING</span>
-                <span className="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              </div>
-            </div>
-
-            {/* Card 5 - Visualization Engine / Interactive Chart Output */}
-            <div className="col-span-12 md:col-span-8 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Visualization Engine</span>
-                <span className="text-lg font-medium text-white block">Raw Data to Instant Chart</span>
-              </div>
-
-              {/* Render dynamic charts inside mockup Card 5 */}
-              <div className="grid grid-cols-3 gap-4.5 my-1 items-center">
-                {/* Left: Input */}
-                <div className="bg-white/3 border border-white/5 p-3 rounded-xl flex flex-col gap-1 h-[72px] justify-center text-left">
-                  <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono">User Search</span>
-                  <p className="text-[10px] text-white leading-tight font-medium italic truncate">"{query}"</p>
-                </div>
-
-                {/* Middle: AI Parser */}
-                <div className="flex flex-col items-center justify-center gap-1.5 h-[72px]">
-                  <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono">Gemini Ingest</span>
-                  <span className="material-symbols-outlined text-lg text-neutral-400 animate-pulse">east</span>
-                  <span className="text-[8px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md font-mono tracking-wider font-semibold">PARSED SCHEMA</span>
-                </div>
-
-                {/* Right: Output Chart */}
-                <div className="bg-white/3 border border-white/5 p-3 rounded-xl flex flex-col gap-1 h-[72px] justify-center text-[10px]">
-                  <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono text-left">Live Output</span>
+          {/* TAB 2: Search Insights Dashboard */}
+          {activeTab === "search" && (
+            <>
+              {insight ? (
+                /* Full Bento Grid */
+                <div className="max-w-7xl mx-auto grid grid-cols-12 gap-5.5">
                   
-                  {chart_type === "comparison_bar" && data_points.length > 0 ? (
-                    <div className="flex flex-col gap-1 overflow-hidden">
-                      {data_points.slice(0, 2).map((pt, i) => (
-                        <div key={i} className="flex items-center gap-1.5">
-                          <span className="w-8 text-[8px] text-neutral-400 font-mono truncate text-left">{pt.label}</span>
-                          <div className={`h-1.5 rounded-full flex-1 ${i === 0 ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gradient-to-r from-emerald-500 to-green-400"}`} style={{ maxWidth: `${Math.min(100, (pt.value / Math.max(...data_points.map(p => p.value || 1))) * 100)}%` }} />
-                          <span className="text-[8px] text-white font-mono">{pt.value}</span>
-                        </div>
-                      ))}
+                  {/* Card 1 - Beige */}
+                  <div className="col-span-12 md:col-span-5 h-[190px] relative bg-[#D0C9B9] rounded-2xl overflow-hidden p-5.5 flex flex-col justify-between text-[#131113] text-left border border-white/10 shadow-[0_4px_24px_rgba(208,201,185,0.06)]">
+                    <div className="flex justify-between relative z-10 items-start">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Live Insight</span>
+                        <span className="text-3xl font-semibold mt-1 block tracking-tight">1 Generated</span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Confidence</span>
+                        <span className="text-3xl font-semibold mt-1 tracking-tight">{confidencePercent}%</span>
+                      </div>
                     </div>
-                  ) : chart_type === "trend_line" && data_points.length > 0 ? (
-                    <div className="relative h-6 w-full flex items-end">
-                      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-                        <path
-                          d={`M ${data_points.map((pt, idx) => `${(idx / (data_points.length - 1)) * 100}%,${100 - (pt.value / Math.max(...data_points.map(p => p.value || 1))) * 80}%`).join(" L ")}`}
-                          fill="none"
-                          stroke="#6366f1"
-                          strokeWidth="2"
-                        />
-                      </svg>
+                    
+                    <div className="flex gap-2 relative z-10 mt-1 mb-8">
+                      <span className="bg-[#131113]/8 border border-[#131113]/10 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase">
+                        {insight.domain || "Grounded Query"}
+                      </span>
+                      <span className="bg-[#131113]/8 border border-[#131113]/10 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase">
+                        {insight.confidence?.toUpperCase()} CONFIDENCE
+                      </span>
                     </div>
-                  ) : (
-                    <div className="text-[9px] text-neutral-400 italic font-medium leading-none truncate text-left">Text insights resolved</div>
-                  )}
-                </div>
-              </div>
+                    
+                    <img src={dashLine.url} alt="" className="absolute inset-x-0 bottom-0 w-full h-[65%] object-cover pointer-events-none z-0 opacity-40 mix-blend-multiply" />
+                  </div>
 
-              <div className="flex justify-between items-center text-[9px] opacity-40 font-mono">
-                <span>STRUCTURED OUTPUT VERIFIED</span>
-                <span>12ms LATENCY</span>
-              </div>
-            </div>
-
-            {/* Row 3: AI News Reader Card (12-columns, full visual grounded display) */}
-            <div className="col-span-12 rounded-2xl border border-white/5 p-6 flex flex-col gap-6 text-left bg-gradient-to-b from-[#111011] to-[#0A090A] relative overflow-hidden">
-              <div className="flex justify-between items-start">
-                <div>
-                  <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Grounded Source Reader</span>
-                  <h3 className="text-2xl font-semibold text-white block mt-1.5 tracking-tight">AI news reader</h3>
-                </div>
-                <span className="bg-[#6366f1]/10 text-[#6366f1] border border-[#6366f1]/20 text-[10px] font-bold tracking-widest px-3.5 py-1.5 rounded-xl uppercase font-mono">
-                  MULTIPLE SOURCES CITED
-                </span>
-              </div>
-
-              {/* News representation layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch border-t border-white/5 pt-6">
-                
-                {/* News Picture visualization block */}
-                <div className="lg:col-span-5 relative rounded-2xl overflow-hidden bg-[#060506] border border-white/5 min-h-[240px] flex items-center justify-center shadow-[inset_0_4px_24px_rgba(0,0,0,0.4)]">
-                  {/* Dynamic weather graphic, movie poster, or generic neon blueprint background */}
-                  {domain === "weather" ? (
-                    <div className="flex flex-col items-center justify-center p-6 text-center">
-                      <span className="text-6xl text-blue-400 animate-bounce">☁️</span>
-                      <span className="text-[10px] font-semibold text-white mt-4 uppercase tracking-widest font-mono">Live Weather Conditions</span>
+                  {/* Card 2 - Pink */}
+                  <div className="col-span-12 md:col-span-3 h-[190px] relative rounded-2xl overflow-hidden p-5.5 flex flex-col justify-between text-neutral-900 bg-gradient-to-br from-[#F5D6FA] via-[#E8B6EE] to-[#D598DC] text-left border border-white/10 shadow-[0_4px_24px_rgba(228,165,237,0.06)]">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Metrics</span>
+                      <span className="text-3xl font-semibold mt-1 tracking-tight">{dataPointsCount}</span>
                     </div>
-                  ) : domain === "movies" && data_points.length > 0 ? (
-                    <div className="flex gap-4.5 p-4.5 items-center justify-center flex-wrap">
-                      {data_points.map((pt, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2 group/card">
-                          <div className="w-18 h-26 rounded-xl overflow-hidden bg-gradient-to-b from-[#181718] to-black border border-white/10 flex items-center justify-center text-center shadow-lg transition-transform duration-300 group-hover/card:scale-105">
-                            {pt.image_url ? (
-                              <img src={pt.image_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="flex flex-col items-center justify-center p-1.5">
-                                <span className="material-symbols-outlined text-neutral-600 text-lg">movie</span>
-                                <span className="text-[7px] text-neutral-500 font-bold uppercase font-mono tracking-widest mt-1 block">OMDb</span>
-                              </div>
-                            )}
+                    <div className="relative z-10">
+                      <span className="text-[10px] font-bold uppercase tracking-wider block">Data points analyzed</span>
+                      <span className="text-[9px] opacity-60 block font-mono mt-0.5">Real-time Verification</span>
+                    </div>
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/25 via-transparent to-transparent pointer-events-none z-0" />
+                  </div>
+
+                  {/* Card 3 - Grounded Sources */}
+                  <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Data Pipeline</span>
+                      <span className="text-lg font-medium text-white block">Grounded Sources</span>
+                    </div>
+
+                    <div className="flex justify-between items-center gap-2.5 my-1">
+                      {/* OMDb API */}
+                      {(() => {
+                        const isActive = insight.sources?.some(s => s.toLowerCase().includes("omdb") || s.toLowerCase().includes("movie"));
+                        return (
+                          <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
+                            isActive 
+                              ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
+                              : "bg-white/3 border-white/5 opacity-55"
+                          }`}>
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <span className={`size-1 rounded-full ${isActive ? "bg-yellow-500 animate-pulse" : "bg-neutral-600"}`} />
+                              <span className="text-[9px] text-yellow-500 font-bold uppercase font-mono tracking-wider">OMDb</span>
+                            </div>
+                            <span className="text-[8px] text-neutral-400 font-medium">Movies</span>
                           </div>
-                          <span className="text-[8px] text-neutral-400 truncate w-18 font-mono text-center font-medium leading-none block">{pt.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="absolute inset-0 bg-cover bg-center opacity-30 select-none pointer-events-none" style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_11QE9Hc3LBDtWGNO1v4Eo5ysLxvFeAIKXVzQffaEUFoGqEJXCq__THNKULccJ0hHxwaMrv0Cu5YdMY2ZNuIOvLhruIsf-nikm2T2L5wv_N82qBhiZZh9RoNllGW0erWyPdaStZOM79OiLBFRQZ_TVDw-oA_X7OSONh45IWqQBp0BPnCQplqSJtFKjyXQliYzddEmiPw9He74TaCAA1b2iYzOk-3j5d5wPokCu1kQh8utz9-X8g')` }} />
-                  )}
-                  
-                  {/* Decorative ping node elements */}
-                  <div className="absolute top-[20%] left-[30%] w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-                  <div className="absolute bottom-[30%] right-[25%] w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-                </div>
+                        );
+                      })()}
 
-                {/* News content right details */}
-                <div className="lg:col-span-7 flex flex-col justify-between gap-6 py-1">
-                  <div className="flex flex-col gap-4">
-                    <p className="text-neutral-200 text-lg leading-relaxed font-normal antialiased">
-                      {caption}
+                      {/* OpenWeather */}
+                      {(() => {
+                        const isActive = insight.sources?.some(s => s.toLowerCase().includes("weather") || s.toLowerCase().includes("temp"));
+                        return (
+                          <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
+                            isActive 
+                              ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
+                              : "bg-white/3 border-white/5 opacity-55"
+                          }`}>
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <span className={`size-1 rounded-full ${isActive ? "bg-blue-400 animate-pulse" : "bg-neutral-600"}`} />
+                              <span className="text-xs text-blue-400 leading-none">☁️</span>
+                            </div>
+                            <span className="text-[8px] text-neutral-400 font-medium">Weather</span>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Google Search */}
+                      {(() => {
+                        const isActive = insight.sources?.some(s => s.toLowerCase().includes("google") || s.toLowerCase().includes("search") || s.toLowerCase().includes("grounding"));
+                        return (
+                          <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
+                            isActive 
+                              ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
+                              : "bg-white/3 border-white/5 opacity-55"
+                          }`}>
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <span className={`size-1 rounded-full ${isActive ? "bg-red-400 animate-pulse" : "bg-neutral-600"}`} />
+                              <span className="text-[9px] text-red-400 font-bold uppercase font-mono tracking-wider">Google</span>
+                            </div>
+                            <span className="text-[8px] text-neutral-400 font-medium">Search</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    <div className="text-center">
+                      <span className="text-[9px] font-mono font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer tracking-wider">+ 4 ACTIVE CONNECTORS</span>
+                    </div>
+                  </div>
+
+                  {/* Card 4 - Live Monitor */}
+                  <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
+                    <div className="flex justify-between items-start">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Live Stream</span>
+                        <span className="text-lg font-medium text-white block">Queries Run</span>
+                      </div>
+                      <div className="flex gap-1.5 mt-1">
+                        <div className="size-2 rounded-full bg-red-500/70" />
+                        <div className="size-2 rounded-full bg-yellow-500/70" />
+                        <div className="size-2 rounded-full bg-green-500/70" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 font-mono text-[9px] leading-normal text-neutral-300 bg-black/40 border border-white/5 p-3 rounded-xl h-19 overflow-y-auto my-1 select-text">
+                      <div className="flex justify-between border-b border-white/5 pb-1">
+                        <span className="text-emerald-400">01 GET /api/search</span>
+                        <span className="text-neutral-500">200 OK</span>
+                      </div>
+                      <div className="text-neutral-400 truncate">02 &gt; query: "{insight.query}"</div>
+                      <div className="text-neutral-300 truncate">03 &gt; chart: {insight.chart_type}</div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-[10px] opacity-40">
+                      <span className="font-mono">STATUS: LISTENING</span>
+                      <span className="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    </div>
+                  </div>
+
+                  {/* Card 5 - Visualization Engine */}
+                  <div className="col-span-12 md:col-span-8 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Visualization Engine</span>
+                      <span className="text-lg font-medium text-white block">Raw Data to Instant Chart</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4.5 my-1 items-center">
+                      <div className="bg-white/3 border border-white/5 p-3 rounded-xl flex flex-col gap-1 h-[72px] justify-center text-left">
+                        <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono">User Search</span>
+                        <p className="text-[10px] text-white leading-tight font-medium italic truncate">"{insight.query}"</p>
+                      </div>
+
+                      <div className="flex flex-col items-center justify-center gap-1.5 h-[72px]">
+                        <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono">Gemini Ingest</span>
+                        <span className="material-symbols-outlined text-lg text-neutral-400 animate-pulse">east</span>
+                        <span className="text-[8px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md font-mono tracking-wider font-semibold">PARSED SCHEMA</span>
+                      </div>
+
+                      <div className="bg-white/3 border border-white/5 p-3 rounded-xl flex flex-col gap-1 h-[72px] justify-center text-[10px]">
+                        <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono text-left">Live Output</span>
+                        
+                        {insight.chart_type === "comparison_bar" && insight.data_points?.length > 0 ? (
+                          <div className="flex flex-col gap-1 overflow-hidden">
+                            {insight.data_points.slice(0, 2).map((pt, i) => (
+                              <div key={i} className="flex items-center gap-1.5">
+                                <span className="w-8 text-[8px] text-neutral-400 font-mono truncate text-left">{pt.label}</span>
+                                <div className={`h-1.5 rounded-full flex-1 ${i === 0 ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gradient-to-r from-emerald-500 to-green-400"}`} style={{ maxWidth: `${Math.min(100, (pt.value / Math.max(...insight.data_points.map(p => p.value || 1))) * 100)}%` }} />
+                                <span className="text-[8px] text-white font-mono">{pt.value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : insight.chart_type === "trend_line" && insight.data_points?.length > 0 ? (
+                          <div className="relative h-6 w-full flex items-end">
+                            <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                              <path
+                                d={`M ${insight.data_points.map((pt, idx) => `${(idx / (insight.data_points.length - 1)) * 100}%,${100 - (pt.value / Math.max(...insight.data_points.map(p => p.value || 1))) * 80}%`).join(" L ")}`}
+                                fill="none"
+                                stroke="#6366f1"
+                                strokeWidth="2"
+                              />
+                            </svg>
+                          </div>
+                        ) : (
+                          <div className="text-[9px] text-neutral-400 italic font-medium leading-none truncate text-left">Text insights resolved</div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-[9px] opacity-40 font-mono">
+                      <span>STRUCTURED OUTPUT VERIFIED</span>
+                      <span>12ms LATENCY</span>
+                    </div>
+                  </div>
+
+                  {/* Row 3: AI News Reader Card */}
+                  <div className="col-span-12 rounded-2xl border border-white/5 p-6 flex flex-col gap-6 text-left bg-gradient-to-b from-[#111011] to-[#0A090A] relative overflow-hidden">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Grounded Source Reader</span>
+                        <h3 className="text-2xl font-semibold text-white block mt-1.5 tracking-tight">AI news reader</h3>
+                      </div>
+                      <span className="bg-[#6366f1]/10 text-[#6366f1] border border-[#6366f1]/20 text-[10px] font-bold tracking-widest px-3.5 py-1.5 rounded-xl uppercase font-mono">
+                        MULTIPLE SOURCES CITED
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch border-t border-white/5 pt-6">
+                      <div className="lg:col-span-5 relative rounded-2xl overflow-hidden bg-[#060506] border border-white/5 min-h-[240px] flex items-center justify-center shadow-[inset_0_4px_24px_rgba(0,0,0,0.4)]">
+                        {insight.domain === "weather" ? (
+                          <div className="flex flex-col items-center justify-center p-6 text-center">
+                            <span className="text-6xl text-blue-400 animate-bounce">☁️</span>
+                            <span className="text-[10px] font-semibold text-white mt-4 uppercase tracking-widest font-mono">Live Weather Conditions</span>
+                          </div>
+                        ) : insight.domain === "movies" && insight.data_points?.length > 0 ? (
+                          <div className="flex gap-4.5 p-4.5 items-center justify-center flex-wrap">
+                            {insight.data_points.map((pt, i) => (
+                              <div key={i} className="flex flex-col items-center gap-2 group/card">
+                                <div className="w-18 h-26 rounded-xl overflow-hidden bg-gradient-to-b from-[#181718] to-black border border-white/10 flex items-center justify-center text-center shadow-lg transition-transform duration-300 group-hover/card:scale-105">
+                                  {pt.image_url ? (
+                                    <img src={pt.image_url} alt="" className="w-full h-full object-cover" />
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center p-1.5">
+                                      <span className="material-symbols-outlined text-neutral-600 text-lg">movie</span>
+                                      <span className="text-[7px] text-neutral-500 font-bold uppercase font-mono tracking-widest mt-1 block">OMDb</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <span className="text-[8px] text-neutral-400 truncate w-18 font-mono text-center font-medium leading-none block">{pt.label}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="absolute inset-0 bg-cover bg-center opacity-30 select-none pointer-events-none" style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_11QE9Hc3LBDtWGNO1v4Eo5ysLxvFeAIKXVzQffaEUFoGqEJXCq__THNKULccJ0hHxwaMrv0Cu5YdMY2ZNuIOvLhruIsf-nikm2T2L5wv_N82qBhiZZh9RoNllGW0erWyPdaStZOM79OiLBFRQZ_TVDw-oA_X7OSONh45IWqQBp0BPnCQplqSJtFKjyXQliYzddEmiPw9He74TaCAA1b2iYzOk-3j5d5wPokCu1kQh8utz9-X8g')` }} />
+                        )}
+                        
+                        <div className="absolute top-[20%] left-[30%] w-2 h-2 bg-blue-500 rounded-full animate-ping" />
+                        <div className="absolute bottom-[30%] right-[25%] w-2 h-2 bg-green-500 rounded-full animate-ping" />
+                      </div>
+
+                      <div className="lg:col-span-7 flex flex-col justify-between gap-6 py-1">
+                        <p className="text-neutral-200 text-lg leading-relaxed font-normal antialiased">
+                          {insight.caption}
+                        </p>
+
+                        {insight.sources?.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-400 mt-auto border-t border-white/5 pt-4">
+                            <span className="font-semibold text-neutral-300 font-mono text-[10px] tracking-wider uppercase">Verified Sources:</span>
+                            {insight.sources.map((src, i) => (
+                              <a 
+                                key={i} 
+                                href={src} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="bg-white/3 hover:bg-white/8 border border-white/5 hover:border-white/12 px-3 py-1.5 rounded-xl text-neutral-300 font-mono text-[10px] transition-all duration-200 flex items-center gap-1.5 truncate max-w-[240px]" 
+                                title={src}
+                              >
+                                <span className="material-symbols-outlined text-[10px] opacity-75">link</span>
+                                {src.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]}
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              ) : (
+                /* Search Landing View */
+                <div className="max-w-2xl w-full text-center relative z-10 flex flex-col items-center gap-8 mx-auto mt-20">
+                  <div className="flex flex-col items-center gap-3">
+                    <span className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs font-mono font-semibold uppercase tracking-widest text-neutral-400">
+                      PulseFeed Live Workspace
+                    </span>
+                    <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white leading-tight">
+                      Ask about anything.
+                    </h2>
+                    <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">
+                      Enter any query below to run a live Google Search Grounding request or pull structured metrics, directly rendering comparative charts.
                     </p>
                   </div>
 
-                  {/* Sources tag list */}
-                  {sources && sources.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-400 mt-auto border-t border-white/5 pt-4">
-                      <span className="font-semibold text-neutral-300 font-mono text-[10px] tracking-wider uppercase">Verified Sources:</span>
-                      {sources.map((src, i) => (
-                        <a 
-                          key={i} 
-                          href={src} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="bg-white/3 hover:bg-white/8 border border-white/5 hover:border-white/12 px-3 py-1.5 rounded-xl text-neutral-300 font-mono text-[10px] transition-all duration-200 flex items-center gap-1.5 truncate max-w-[240px]" 
-                          title={src}
+                  <div className="w-full relative flex items-center gap-3">
+                    <div className="relative flex-grow">
+                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 text-xl">search</span>
+                      <input 
+                        type="text" 
+                        placeholder="Query prices, job trends, ratings, comparisons..." 
+                        value={insideSearchQuery}
+                        onChange={(e) => setInsideSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleInsideSearch()}
+                        className="w-full bg-[#111011] border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white/20 transition-all duration-200 shadow-2xl"
+                        autoFocus
+                      />
+                    </div>
+                    <button
+                      onClick={handleInsideSearch}
+                      disabled={isSearching}
+                      className="bg-white hover:bg-neutral-200 text-black text-sm font-semibold px-6 py-4 rounded-2xl transition-all duration-200 disabled:opacity-50 cursor-pointer shrink-0"
+                    >
+                      {isSearching ? "Searching..." : "Search"}
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-3 mt-2">
+                    <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase font-mono">Suggested live queries:</span>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {[
+                        "React developer salaries in Bangalore",
+                        "Tokyo temperature comparison",
+                        "Oppenheimer box office collections",
+                        "best budget noise cancelling headphones under 3000 rupees"
+                      ].map((prompt, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setInsideSearchQuery(prompt);
+                            onSearch(prompt);
+                          }}
+                          disabled={isSearching}
+                          className="bg-white/5 hover:bg-white/8 border border-white/5 px-3 py-2 rounded-xl text-xs text-neutral-300 font-mono transition-all duration-200 hover:border-white/10 cursor-pointer disabled:opacity-50"
                         >
-                          <span className="material-symbols-outlined text-[10px] opacity-75">link</span>
-                          {src.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]}
-                        </a>
+                          {prompt}
+                        </button>
                       ))}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
+          )}
 
-          </div>
-        </section>
+          {/* TAB 3: Historical Insights Archives */}
+          {activeTab === "history" && (
+            <div className="max-w-5xl mx-auto space-y-6 text-left">
+              <div className="flex flex-col gap-2 border-b border-white/5 pb-6">
+                <h3 className="text-3xl font-semibold tracking-tight text-white">All Insights History</h3>
+                <p className="text-neutral-400 text-sm leading-relaxed">
+                  Review previously saved queries and grounding metrics generated by active pipeline workers.
+                </p>
+              </div>
+
+              {isFetchingHistory ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-3">
+                  <span className="material-symbols-outlined text-3xl text-neutral-500 animate-spin">sync</span>
+                  <span className="text-xs font-mono text-neutral-400 uppercase tracking-widest animate-pulse">FETCHING INSIGHT HISTORY...</span>
+                </div>
+              ) : historyList.length === 0 ? (
+                <div className="text-center py-20 border border-white/5 rounded-2xl bg-white/3">
+                  <span className="material-symbols-outlined text-4xl text-neutral-600 mb-3 block">inventory_2</span>
+                  <p className="text-neutral-400 font-medium">No stored insights found in history archive.</p>
+                  <button 
+                    onClick={() => setActiveTab("search")}
+                    className="mt-4 bg-white text-black px-4 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-200 transition-colors"
+                  >
+                    Start a search
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {historyList.map((item, idx) => (
+                    <div 
+                      key={item.id || idx} 
+                      className="border border-white/5 rounded-2xl p-5.5 bg-gradient-to-b from-[#111011] to-[#0A090A] flex flex-col justify-between min-h-[220px]"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-start gap-2">
+                          <span className="text-xs font-bold uppercase font-mono tracking-widest text-[#22d3ee]/85">{item.domain || "grounded_search"}</span>
+                          <span className="text-[10px] bg-white/5 text-neutral-400 border border-white/10 px-2 py-0.5 rounded uppercase font-semibold">{item.confidence} confidence</span>
+                        </div>
+                        <h4 className="text-base font-semibold text-white tracking-tight line-clamp-1">{item.query || "Live Query"}</h4>
+                        <p className="text-xs text-neutral-400 leading-relaxed line-clamp-3 mt-1.5">{item.caption}</p>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-4">
+                        <span className="text-[9px] text-neutral-500 font-mono">
+                          {item.timestamp ? "SAVED IN ARCHIVE" : "SESSION ACTIVE"}
+                        </span>
+                        <button
+                          onClick={() => {
+                            onSelectInsight(item);
+                            setActiveTab("search");
+                          }}
+                          className="bg-white hover:bg-neutral-200 text-black text-xs font-bold px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                        >
+                          Review Insight
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
       </main>
     </div>
   );
