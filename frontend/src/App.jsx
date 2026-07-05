@@ -69,7 +69,8 @@ function App() {
     }
   };
 
-  // Opens the access gate modal (gated entry into dashboard)
+  // Keep every entry path behind the same gate so the dashboard and live search
+  // both require the access code or waitlist flow before showing results.
   const enterDashboardLive = () => {
     setShowGate(true);
   };
@@ -108,7 +109,8 @@ function App() {
     }
   }, [selectedDomains, showLiveDemo]);
 
-  // Handle live search POST request
+  // Actual search happens only after the gate is passed. The landing-page
+  // search box is just a login entry point so visitors cannot bypass the gate.
   const handleSearch = async (overrideQuery = null) => {
     const targetQuery = typeof overrideQuery === "string" ? overrideQuery : searchQuery;
     if (!targetQuery.trim()) return;
@@ -338,10 +340,12 @@ function App() {
                     speed={70} 
                     value={searchQuery}
                     onChange={setSearchQuery}
-                    onSearch={handleSearch}
+                    // This hero search is a gate trigger, not a direct search request.
+                    onSearch={enterDashboardLive}
                   />
                   <button 
-                    onClick={handleSearch}
+                    // Same gate behavior as the input so the CTA and search keep one login path.
+                    onClick={enterDashboardLive}
                     disabled={isSearching}
                     className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg h-8 px-4 transition-colors disabled:opacity-50 cursor-pointer"
                   >
@@ -1647,6 +1651,7 @@ function TypingPlaceholderInput({ placeholder, startDelay = 2000, speed = 70, va
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
+      // The parent decides whether Enter means login-gate entry or in-dashboard search.
       onSearch();
     }
   };
