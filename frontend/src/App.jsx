@@ -1537,40 +1537,45 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
     <div className="flex h-screen w-full bg-black text-[#f5f5f5] font-display antialiased overflow-hidden select-none">
       
       {/* Sidebar Navigation */}
-      <aside className="w-56 bg-black border-r border-white/10 flex flex-col justify-between py-6 px-4 z-50 shrink-0 text-left">
-        <div className="flex flex-col gap-8">
-          <div className="flex items-center gap-3">
-            <img src={logoUrl} alt="Logo" width={32} height={32} />
-            <span className="text-lg font-medium text-neutral-100 font-display">PulseFeed</span>
+      <aside className="w-60 bg-gradient-to-b from-[#0A090A] to-[#121112] border-r border-white/5 flex flex-col justify-between py-6 px-4.5 z-50 shrink-0 text-left">
+        <div className="flex flex-col gap-9">
+          <div className="flex items-center gap-3 px-1.5">
+            <div className="size-8.5 rounded-xl bg-white/10 flex items-center justify-center border border-white/15">
+              <img src={logoUrl} alt="Logo" width={20} height={20} />
+            </div>
+            <span className="text-lg font-semibold tracking-tight text-white font-display">PulseFeed</span>
           </div>
 
           <nav className="flex flex-col gap-1.5">
             {[
               { label: "Feed", active: false, icon: "feed", action: onClose },
               { label: "Filters", active: false, icon: "filter_list" },
-              { label: "Search", active: true, icon: "search" },
+              { label: "Search Insights", active: true, icon: "search" },
               { label: "All Insights", active: false, icon: "database" },
             ].map((item, idx) => (
               <button
                 key={idx}
                 onClick={item.action}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-left ${
+                className={`flex items-center gap-3 px-3.5 py-2.5.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-left relative ${
                   item.active 
-                    ? "bg-white/10 text-white border border-white/5" 
-                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                    ? "bg-white/10 text-white border border-white/5 shadow-[0_2px_12px_rgba(255,255,255,0.03)]" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/5 hover:translate-x-0.5"
                 }`}
               >
-                <span className="material-symbols-outlined text-lg">{item.icon}</span>
+                {item.active && (
+                  <span className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-white rounded-r-md" />
+                )}
+                <span className="material-symbols-outlined text-[19px] opacity-80">{item.icon}</span>
                 {item.label}
               </button>
             ))}
           </nav>
         </div>
 
-        <div>
+        <div className="px-1.5">
           <button 
             onClick={onClose}
-            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-3 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-3 text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer hover:shadow-[0_2px_12px_rgba(255,255,255,0.03)]"
           >
             Back to Home
           </button>
@@ -1578,29 +1583,32 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
       </aside>
 
       {/* Main Canvas Dashboard */}
-      <main className="flex-grow flex flex-col relative h-full overflow-hidden bg-[#0A090A]">
+      <main className="flex-1 flex flex-col relative h-full overflow-hidden bg-[#070607]">
         
         {/* Top Header */}
-        <header className="h-16 border-b border-white/10 flex justify-between items-center px-8 shrink-0 bg-black/40">
+        <header className="h-16 border-b border-white/5 flex justify-between items-center px-8 shrink-0 bg-black/30 backdrop-blur-xl">
           <div className="flex flex-col text-left">
-            <span className="text-xs uppercase font-mono tracking-widest text-neutral-400 font-semibold leading-none">Internal View</span>
-            <span className="text-sm font-medium text-white mt-1">PulseFeed Interactive Dashboard</span>
+            <span className="text-[10px] uppercase font-mono tracking-widest text-neutral-400 font-semibold leading-none">Internal View</span>
+            <span className="text-sm font-semibold text-white mt-1.5">PulseFeed Interactive Dashboard</span>
           </div>
 
           {/* Search bar inside header */}
-          <div className="w-96 relative flex items-center gap-3">
-            <input 
-              type="text" 
-              placeholder="Search another topic..." 
-              value={insideSearchQuery}
-              onChange={(e) => setInsideSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleInsideSearch()}
-              className="w-full bg-[#131113] border border-white/10 rounded-xl px-4 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white/30 transition-colors"
-            />
+          <div className="w-[420px] relative flex items-center gap-3">
+            <div className="relative flex-1">
+              <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 text-lg">search</span>
+              <input 
+                type="text" 
+                placeholder="Ask PulseFeed another topic..." 
+                value={insideSearchQuery}
+                onChange={(e) => setInsideSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleInsideSearch()}
+                className="w-full bg-[#111011] border border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white/15 transition-all duration-200"
+              />
+            </div>
             <button
               onClick={handleInsideSearch}
               disabled={isSearching}
-              className="bg-white hover:bg-neutral-200 text-black text-xs font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50 cursor-pointer shrink-0"
+              className="bg-white hover:bg-neutral-200 text-black text-xs font-semibold px-4.5 py-2.5 rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer shrink-0"
             >
               {isSearching ? "Searching..." : "Search"}
             </button>
@@ -1609,142 +1617,181 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
 
         {/* Bento grid content */}
         <section className="flex-1 p-6 overflow-y-auto space-y-6">
-          <div className="max-w-7xl mx-auto grid grid-cols-12 gap-5">
+          <div className="max-w-7xl mx-auto grid grid-cols-12 gap-5.5">
             
             {/* Row 1: Card 1 (Beige), Card 2 (Pink), Card 3 (Grounded Sources) */}
             
             {/* Card 1 - Beige */}
-            <div className="col-span-12 md:col-span-5 h-[190px] relative bg-[#D0C9B9] rounded-2xl overflow-hidden p-5 flex flex-col justify-between text-[#131113] text-left">
-              <div className="flex justify-between relative z-10">
+            <div className="col-span-12 md:col-span-5 h-[190px] relative bg-[#D0C9B9] rounded-2xl overflow-hidden p-5.5 flex flex-col justify-between text-[#131113] text-left border border-white/10 shadow-[0_4px_24px_rgba(208,201,185,0.06)]">
+              <div className="flex justify-between relative z-10 items-start">
                 <div className="flex flex-col">
-                  <span className="text-xs opacity-40 block font-mono">Live Insight</span>
-                  <span className="text-2xl font-medium mt-1 block">1 Generated</span>
+                  <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Live Insight</span>
+                  <span className="text-3xl font-semibold mt-1 block tracking-tight">1 Generated</span>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-xs opacity-40 block font-mono">Confidence</span>
-                  <span className="text-2xl font-medium mt-1">{confidencePercent}%</span>
+                  <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Confidence</span>
+                  <span className="text-3xl font-semibold mt-1 tracking-tight">{confidencePercent}%</span>
                 </div>
               </div>
-              <div className="flex justify-between w-full mt-3 relative z-10 text-xs font-medium">
-                <span className="text-stone-950 uppercase">{domain || "Grounded Query"}</span>
-                <span className="opacity-40">{confidence.toUpperCase()} CONFIDENCE</span>
+              
+              {/* Taggings: placed cleanly above the graph to completely avoid overlap */}
+              <div className="flex gap-2 relative z-10 mt-1 mb-8">
+                <span className="bg-[#131113]/8 border border-[#131113]/10 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase">
+                  {domain || "Grounded Query"}
+                </span>
+                <span className="bg-[#131113]/8 border border-[#131113]/10 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase">
+                  {confidence.toUpperCase()} CONFIDENCE
+                </span>
               </div>
-              <img src={dashLine.url} alt="" className="absolute inset-0 w-full h-full object-cover scale-[1.015] origin-center pointer-events-none z-0 opacity-80" />
+              
+              <img src={dashLine.url} alt="" className="absolute inset-x-0 bottom-0 w-full h-[65%] object-cover pointer-events-none z-0 opacity-40 mix-blend-multiply" />
             </div>
 
             {/* Card 2 - Pink */}
-            <div className="col-span-12 md:col-span-3 h-[190px] relative rounded-2xl overflow-hidden flex flex-col justify-center items-center">
-              <img src={dashCard3Pink.url} alt="" className="absolute inset-0 w-full h-full object-cover z-0" />
-              <div className="relative z-10 flex flex-col items-center">
-                <span className="text-3xl font-medium text-neutral-900 font-mono">
-                  {dataPointsCount}
-                </span>
-                <span className="text-sm text-neutral-900/60 mt-1 font-medium">
-                  Data points analyzed
-                </span>
+            <div className="col-span-12 md:col-span-3 h-[190px] relative rounded-2xl overflow-hidden p-5.5 flex flex-col justify-between text-neutral-900 bg-gradient-to-br from-[#F5D6FA] via-[#E8B6EE] to-[#D598DC] text-left border border-white/10 shadow-[0_4px_24px_rgba(228,165,237,0.06)]">
+              <div className="flex flex-col">
+                <span className="text-[10px] opacity-50 block font-mono uppercase tracking-widest font-bold">Metrics</span>
+                <span className="text-3xl font-semibold mt-1 tracking-tight">{dataPointsCount}</span>
               </div>
+              <div className="relative z-10">
+                <span className="text-[10px] font-bold uppercase tracking-wider block">Data points analyzed</span>
+                <span className="text-[9px] opacity-60 block font-mono mt-0.5">Real-time Verification</span>
+              </div>
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/25 via-transparent to-transparent pointer-events-none z-0" />
             </div>
 
             {/* Card 3 - Grounded Sources */}
-            <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none bg-[#0F0D0F]">
+            <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block font-mono">Data Pipeline</span>
+                <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Data Pipeline</span>
                 <span className="text-lg font-medium text-white block">Grounded Sources</span>
               </div>
 
-              <div className="flex justify-between items-center gap-2 my-1">
+              <div className="flex justify-between items-center gap-2.5 my-1">
                 {/* OMDb API */}
-                <div className={`h-12 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-colors ${
-                  sources.some(s => s.toLowerCase().includes("omdb") || s.toLowerCase().includes("movie"))
-                    ? "bg-[#6366f1]/10 border-[#6366f1]/40" 
-                    : "bg-white/5 border-white/10"
-                }`}>
-                  <span className="text-[9px] text-yellow-500 font-bold uppercase font-mono">OMDb</span>
-                  <span className="text-[7px] text-neutral-400 font-semibold">Movies</span>
-                </div>
+                {(() => {
+                  const isActive = sources.some(s => s.toLowerCase().includes("omdb") || s.toLowerCase().includes("movie"));
+                  return (
+                    <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
+                      isActive 
+                        ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
+                        : "bg-white/3 border-white/5 opacity-55"
+                    }`}>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className={`size-1 rounded-full ${isActive ? "bg-yellow-500 animate-pulse" : "bg-neutral-600"}`} />
+                        <span className="text-[9px] text-yellow-500 font-bold uppercase font-mono tracking-wider">OMDb</span>
+                      </div>
+                      <span className="text-[8px] text-neutral-400 font-medium">Movies</span>
+                    </div>
+                  );
+                })()}
+
                 {/* OpenWeather */}
-                <div className={`h-12 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-colors ${
-                  sources.some(s => s.toLowerCase().includes("weather") || s.toLowerCase().includes("temp"))
-                    ? "bg-[#6366f1]/10 border-[#6366f1]/40" 
-                    : "bg-white/5 border-white/10"
-                }`}>
-                  <span className="text-xs text-blue-400 font-bold leading-none">☁️</span>
-                  <span className="text-[7px] text-neutral-400 font-semibold mt-0.5">Weather</span>
-                </div>
+                {(() => {
+                  const isActive = sources.some(s => s.toLowerCase().includes("weather") || s.toLowerCase().includes("temp"));
+                  return (
+                    <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
+                      isActive 
+                        ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
+                        : "bg-white/3 border-white/5 opacity-55"
+                    }`}>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className={`size-1 rounded-full ${isActive ? "bg-blue-400 animate-pulse" : "bg-neutral-600"}`} />
+                        <span className="text-xs text-blue-400 leading-none">☁️</span>
+                      </div>
+                      <span className="text-[8px] text-neutral-400 font-medium">Weather</span>
+                    </div>
+                  );
+                })()}
+
                 {/* Google Search */}
-                <div className={`h-12 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-colors ${
-                  sources.some(s => s.toLowerCase().includes("google") || s.toLowerCase().includes("search") || s.toLowerCase().includes("grounding"))
-                    ? "bg-[#6366f1]/10 border-[#6366f1]/40" 
-                    : "bg-white/5 border-white/10"
-                }`}>
-                  <span className="text-xs text-red-400 font-bold leading-none">G</span>
-                  <span className="text-[7px] text-neutral-400 font-semibold mt-0.5">Google</span>
-                </div>
+                {(() => {
+                  const isActive = sources.some(s => s.toLowerCase().includes("google") || s.toLowerCase().includes("search") || s.toLowerCase().includes("grounding"));
+                  return (
+                    <div className={`h-13 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-all duration-200 ${
+                      isActive 
+                        ? "bg-[#6366f1]/10 border-[#6366f1]/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]" 
+                        : "bg-white/3 border-white/5 opacity-55"
+                    }`}>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className={`size-1 rounded-full ${isActive ? "bg-red-400 animate-pulse" : "bg-neutral-600"}`} />
+                        <span className="text-[9px] text-red-400 font-bold uppercase font-mono tracking-wider">Google</span>
+                      </div>
+                      <span className="text-[8px] text-neutral-400 font-medium">Search</span>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="text-center">
-                <span className="text-[10px] font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">+ 4 integrations</span>
+                <span className="text-[9px] font-mono font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer tracking-wider">+ 4 ACTIVE CONNECTORS</span>
               </div>
             </div>
 
             {/* Row 2: Card 4 (Queries Run), Card 5 (Visualization Engine / Dynamic Chart) */}
 
             {/* Card 4 - Live Monitor */}
-            <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none bg-[#0F0D0F]">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block font-mono">Live Stream</span>
-                <span className="text-lg font-medium text-white block">Queries Run</span>
+            <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
+              <div className="flex justify-between items-start">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Live Stream</span>
+                  <span className="text-lg font-medium text-white block">Queries Run</span>
+                </div>
+                {/* Mac window dots style */}
+                <div className="flex gap-1.5 mt-1">
+                  <div className="size-2 rounded-full bg-red-500/70" />
+                  <div className="size-2 rounded-full bg-yellow-500/70" />
+                  <div className="size-2 rounded-full bg-green-500/70" />
+                </div>
               </div>
 
-              <div className="flex flex-col gap-1.5 font-mono text-[8px] leading-normal text-neutral-300 bg-black/40 border border-white/5 p-2.5 rounded-xl h-18 overflow-hidden my-1">
+              <div className="flex flex-col gap-1.5 font-mono text-[9px] leading-normal text-neutral-300 bg-black/40 border border-white/5 p-3 rounded-xl h-19 overflow-y-auto my-1 select-text">
                 <div className="flex justify-between border-b border-white/5 pb-1">
-                  <span className="text-green-400">GET /api/search</span>
+                  <span className="text-emerald-400">01 GET /api/search</span>
                   <span className="text-neutral-500">200 OK</span>
                 </div>
-                <div className="text-neutral-400 truncate">&gt; query: "{query}"</div>
-                <div className="text-neutral-500 truncate">&gt; chart: {chart_type}</div>
+                <div className="text-neutral-400 truncate">02 &gt; query: "{query}"</div>
+                <div className="text-neutral-300 truncate">03 &gt; chart: {chart_type}</div>
               </div>
 
               <div className="flex justify-between items-center text-[10px] opacity-40">
-                <span>Status: Listening</span>
-                <span className="size-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span className="font-mono">STATUS: LISTENING</span>
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
               </div>
             </div>
 
             {/* Card 5 - Visualization Engine / Interactive Chart Output */}
-            <div className="col-span-12 md:col-span-8 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none bg-[#0F0D0F]">
+            <div className="col-span-12 md:col-span-8 h-[190px] rounded-2xl border border-white/5 p-5.5 flex flex-col justify-between text-left select-none bg-gradient-to-b from-[#111011] to-[#0A090A]">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block font-mono">Visualization Engine</span>
+                <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Visualization Engine</span>
                 <span className="text-lg font-medium text-white block">Raw Data to Instant Chart</span>
               </div>
 
               {/* Render dynamic charts inside mockup Card 5 */}
-              <div className="grid grid-cols-3 gap-4 my-1 items-center">
+              <div className="grid grid-cols-3 gap-4.5 my-1 items-center">
                 {/* Left: Input */}
-                <div className="bg-white/5 border border-white/10 p-2.5 rounded-xl flex flex-col gap-1 h-[68px] justify-center">
-                  <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold">User Search</span>
+                <div className="bg-white/3 border border-white/5 p-3 rounded-xl flex flex-col gap-1 h-[72px] justify-center text-left">
+                  <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono">User Search</span>
                   <p className="text-[10px] text-white leading-tight font-medium italic truncate">"{query}"</p>
                 </div>
 
                 {/* Middle: AI Parser */}
-                <div className="flex flex-col items-center justify-center gap-1 h-[68px]">
-                  <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold">Gemini Parser</span>
-                  <svg className="w-4 h-4 text-neutral-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                  <span className="text-[8px] bg-blue-500/10 text-blue-400 border border-blue-500/25 px-1.5 py-0.5 rounded leading-none">Grounded Schema</span>
+                <div className="flex flex-col items-center justify-center gap-1.5 h-[72px]">
+                  <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono">Gemini Ingest</span>
+                  <span className="material-symbols-outlined text-lg text-neutral-400 animate-pulse">east</span>
+                  <span className="text-[8px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md font-mono tracking-wider font-semibold">PARSED SCHEMA</span>
                 </div>
 
                 {/* Right: Output Chart */}
-                <div className="bg-white/5 border border-white/10 p-2.5 rounded-xl flex flex-col gap-1 h-[68px] justify-center text-[10px]">
-                  <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold font-mono">Live Chart</span>
+                <div className="bg-white/3 border border-white/5 p-3 rounded-xl flex flex-col gap-1 h-[72px] justify-center text-[10px]">
+                  <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-semibold font-mono text-left">Live Output</span>
                   
                   {chart_type === "comparison_bar" && data_points.length > 0 ? (
                     <div className="flex flex-col gap-1 overflow-hidden">
                       {data_points.slice(0, 2).map((pt, i) => (
                         <div key={i} className="flex items-center gap-1.5">
-                          <span className="w-8 text-[8px] text-neutral-400 font-mono truncate">{pt.label}</span>
-                          <div className={`h-1 rounded-full flex-1 ${i === 0 ? "bg-blue-500" : "bg-green-500"}`} style={{ maxWidth: `${Math.min(100, (pt.value / Math.max(...data_points.map(p => p.value || 1))) * 100)}%` }} />
+                          <span className="w-8 text-[8px] text-neutral-400 font-mono truncate text-left">{pt.label}</span>
+                          <div className={`h-1.5 rounded-full flex-1 ${i === 0 ? "bg-gradient-to-r from-blue-500 to-cyan-400" : "bg-gradient-to-r from-emerald-500 to-green-400"}`} style={{ maxWidth: `${Math.min(100, (pt.value / Math.max(...data_points.map(p => p.value || 1))) * 100)}%` }} />
                           <span className="text-[8px] text-white font-mono">{pt.value}</span>
                         </div>
                       ))}
@@ -1761,52 +1808,55 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
                       </svg>
                     </div>
                   ) : (
-                    <div className="text-[9px] text-neutral-400 italic font-medium leading-none truncate">Text insights resolved</div>
+                    <div className="text-[9px] text-neutral-400 italic font-medium leading-none truncate text-left">Text insights resolved</div>
                   )}
                 </div>
               </div>
 
-              <div className="flex justify-between items-center text-[10px] opacity-40">
-                <span>Structured output schema parsed</span>
-                <span>12ms latency</span>
+              <div className="flex justify-between items-center text-[9px] opacity-40 font-mono">
+                <span>STRUCTURED OUTPUT VERIFIED</span>
+                <span>12ms LATENCY</span>
               </div>
             </div>
 
             {/* Row 3: AI News Reader Card (12-columns, full visual grounded display) */}
-            <div className="col-span-12 rounded-2xl border border-white/10 p-6 flex flex-col gap-6 text-left bg-[#0F0D0F] relative overflow-hidden">
+            <div className="col-span-12 rounded-2xl border border-white/5 p-6 flex flex-col gap-6 text-left bg-gradient-to-b from-[#111011] to-[#0A090A] relative overflow-hidden">
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block font-mono">Grounded Source Reader</span>
-                  <h3 className="text-2xl font-medium text-white block mt-1">AI news reader</h3>
+                  <span className="text-[9px] opacity-40 font-bold uppercase tracking-widest block font-mono">Grounded Source Reader</span>
+                  <h3 className="text-2xl font-semibold text-white block mt-1.5 tracking-tight">AI news reader</h3>
                 </div>
-                <span className="bg-[#6366f1]/10 text-[#6366f1] border border-[#6366f1]/25 text-xs font-semibold px-3.5 py-1.5 rounded-lg uppercase tracking-wider font-mono">
+                <span className="bg-[#6366f1]/10 text-[#6366f1] border border-[#6366f1]/20 text-[10px] font-bold tracking-widest px-3.5 py-1.5 rounded-xl uppercase font-mono">
                   MULTIPLE SOURCES CITED
                 </span>
               </div>
 
               {/* News representation layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-white/5 pt-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch border-t border-white/5 pt-6">
                 
                 {/* News Picture visualization block */}
-                <div className="lg:col-span-5 relative rounded-xl overflow-hidden bg-[#0A090A] border border-white/5 min-h-[220px] flex items-center justify-center">
+                <div className="lg:col-span-5 relative rounded-2xl overflow-hidden bg-[#060506] border border-white/5 min-h-[240px] flex items-center justify-center shadow-[inset_0_4px_24px_rgba(0,0,0,0.4)]">
                   {/* Dynamic weather graphic, movie poster, or generic neon blueprint background */}
                   {domain === "weather" ? (
                     <div className="flex flex-col items-center justify-center p-6 text-center">
                       <span className="text-6xl text-blue-400 animate-bounce">☁️</span>
-                      <span className="text-sm font-semibold text-white mt-4 uppercase tracking-widest font-mono">Live Weather Conditions</span>
+                      <span className="text-[10px] font-semibold text-white mt-4 uppercase tracking-widest font-mono">Live Weather Conditions</span>
                     </div>
                   ) : domain === "movies" && data_points.length > 0 ? (
-                    <div className="flex gap-4 p-4 items-center justify-center">
+                    <div className="flex gap-4.5 p-4.5 items-center justify-center flex-wrap">
                       {data_points.map((pt, i) => (
-                        <div key={i} className="flex flex-col items-center gap-1.5">
-                          <div className="w-16 h-24 rounded-lg overflow-hidden bg-neutral-900 border border-white/10 flex items-center justify-center text-center">
+                        <div key={i} className="flex flex-col items-center gap-2 group/card">
+                          <div className="w-18 h-26 rounded-xl overflow-hidden bg-gradient-to-b from-[#181718] to-black border border-white/10 flex items-center justify-center text-center shadow-lg transition-transform duration-300 group-hover/card:scale-105">
                             {pt.image_url ? (
                               <img src={pt.image_url} alt="" className="w-full h-full object-cover" />
                             ) : (
-                              <span className="text-[10px] text-neutral-500 font-bold uppercase font-mono">OMDb</span>
+                              <div className="flex flex-col items-center justify-center p-1.5">
+                                <span className="material-symbols-outlined text-neutral-600 text-lg">movie</span>
+                                <span className="text-[7px] text-neutral-500 font-bold uppercase font-mono tracking-widest mt-1 block">OMDb</span>
+                              </div>
                             )}
                           </div>
-                          <span className="text-[9px] text-neutral-400 truncate w-16 font-mono text-center">{pt.label}</span>
+                          <span className="text-[8px] text-neutral-400 truncate w-18 font-mono text-center font-medium leading-none block">{pt.label}</span>
                         </div>
                       ))}
                     </div>
@@ -1820,21 +1870,29 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
                 </div>
 
                 {/* News content right details */}
-                <div className="lg:col-span-7 flex flex-col justify-between h-full gap-4">
+                <div className="lg:col-span-7 flex flex-col justify-between gap-6 py-1">
                   <div className="flex flex-col gap-4">
-                    <p className="text-neutral-100 text-lg leading-relaxed font-normal">
+                    <p className="text-neutral-200 text-lg leading-relaxed font-normal antialiased">
                       {caption}
                     </p>
                   </div>
 
                   {/* Sources tag list */}
                   {sources && sources.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
-                      <span className="font-semibold text-neutral-300">Verified Sources:</span>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-400 mt-auto border-t border-white/5 pt-4">
+                      <span className="font-semibold text-neutral-300 font-mono text-[10px] tracking-wider uppercase">Verified Sources:</span>
                       {sources.map((src, i) => (
-                        <span key={i} className="bg-white/5 border border-white/10 px-2.5 py-1 rounded text-neutral-300 font-mono truncate max-w-[200px]" title={src}>
+                        <a 
+                          key={i} 
+                          href={src} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="bg-white/3 hover:bg-white/8 border border-white/5 hover:border-white/12 px-3 py-1.5 rounded-xl text-neutral-300 font-mono text-[10px] transition-all duration-200 flex items-center gap-1.5 truncate max-w-[240px]" 
+                          title={src}
+                        >
+                          <span className="material-symbols-outlined text-[10px] opacity-75">link</span>
                           {src.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]}
-                        </span>
+                        </a>
                       ))}
                     </div>
                   )}
