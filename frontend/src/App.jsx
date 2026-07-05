@@ -421,34 +421,122 @@ function App() {
                     </div>
                   </motion.div>
 
-                  {/* Card 3 - Custom AI */}
+                  {/* Card 3 - Grounded Sources */}
                   <motion.div
-                    className="w-72 h-60 rounded-2xl overflow-hidden"
+                    className="w-72 h-60 rounded-2xl border border-white/10 p-6 flex flex-col justify-between text-left select-none"
+                    style={{ backgroundColor: "#0F0D0F" }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.3, ease: "easeOut" }}
                   >
-                    <img src={dashCard3.url} alt="" className="w-full h-full object-cover" />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block">Data Pipeline</span>
+                      <span className="text-xl font-medium text-white block">Grounded Sources</span>
+                    </div>
+
+                    <div className="flex justify-between items-center gap-3 my-2">
+                      {/* OMDb API */}
+                      <div className="size-16 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-2 text-center">
+                        <span className="text-[10px] text-yellow-500 font-bold uppercase font-mono">OMDb</span>
+                        <span className="text-[8px] text-neutral-400 font-semibold mt-1">Movies</span>
+                      </div>
+                      {/* OpenWeather */}
+                      <div className="size-16 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-2 text-center">
+                        <span className="text-xs text-blue-400 font-bold">☁️</span>
+                        <span className="text-[8px] text-neutral-400 font-semibold mt-0.5">Weather</span>
+                      </div>
+                      {/* Google Search */}
+                      <div className="size-16 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-2 text-center">
+                        <span className="text-xs text-red-400 font-bold">G</span>
+                        <span className="text-[8px] text-neutral-400 font-semibold mt-0.5">Google</span>
+                      </div>
+                    </div>
+
+                    <div className="text-center">
+                      <span className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">+ 4 integrations</span>
+                    </div>
                   </motion.div>
 
-                  {/* Card 4 - Its Magic */}
+                  {/* Card 4 - Live Monitor */}
                   <motion.div
-                    className="w-72 h-60 rounded-2xl overflow-hidden -mt-[56px]"
+                    className="w-72 h-60 rounded-2xl border border-white/10 p-6 flex flex-col justify-between text-left -mt-[56px] select-none"
+                    style={{ backgroundColor: "#0F0D0F" }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.36, ease: "easeOut" }}
                   >
-                    <img src={dashCard4.url} alt="" className="w-full h-full object-contain object-center" />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block">Live Stream</span>
+                      <span className="text-xl font-medium text-white block">Queries Run</span>
+                    </div>
+
+                    <div className="flex flex-col gap-2 font-mono text-[9px] leading-normal text-neutral-300 bg-black/40 border border-white/5 p-3 rounded-xl h-24 overflow-hidden">
+                      <div className="flex justify-between border-b border-white/5 pb-1">
+                        <span className="text-green-400">GET /api/search</span>
+                        <span className="text-neutral-500">200 OK</span>
+                      </div>
+                      <div className="text-neutral-400 truncate">&gt; query: "iPhone vs Galaxy prices"</div>
+                      <div className="text-neutral-500 truncate">&gt; confidence: High</div>
+                      <div className="text-neutral-500 truncate">&gt; chart: comparison_bar</div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-xs opacity-40">
+                      <span>Status: Listening</span>
+                      <span className="size-2 rounded-full bg-green-500 animate-pulse"></span>
+                    </div>
                   </motion.div>
 
-                  {/* Card 5 - AI Created */}
+                  {/* Card 5 - Visualization Engine */}
                   <motion.div
-                    className="w-[555px] h-60 rounded-2xl overflow-hidden -mt-[56px]"
+                    className="w-[555px] h-60 rounded-2xl border border-white/10 p-6 flex flex-col justify-between text-left -mt-[56px] select-none"
+                    style={{ backgroundColor: "#0F0D0F" }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.42, ease: "easeOut" }}
                   >
-                    <img src={dashCard5.url} alt="" className="w-full h-full object-contain object-center" />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block">Visualization Engine</span>
+                      <span className="text-xl font-medium text-white block">Raw Data to Instant Chart</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-6 my-2 items-center">
+                      {/* Left: Input */}
+                      <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex flex-col gap-1.5 h-[84px] justify-center">
+                        <span className="text-[9px] uppercase tracking-wider text-neutral-400 font-semibold">User Search</span>
+                        <p className="text-[11px] text-white leading-normal font-medium italic">"Compare London vs Tokyo temps"</p>
+                      </div>
+
+                      {/* Middle: AI Parser */}
+                      <div className="flex flex-col items-center justify-center gap-1.5 h-[84px]">
+                        <span className="text-[9px] uppercase tracking-wider text-neutral-400 font-semibold">Gemini Parser</span>
+                        <svg className="w-6 h-6 text-neutral-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                        <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded">Grounded API</span>
+                      </div>
+
+                      {/* Right: Output Chart */}
+                      <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex flex-col gap-2 h-[84px] justify-center text-xs">
+                        <span className="text-[9px] uppercase tracking-wider text-neutral-400 font-semibold">CSS Chart Output</span>
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="w-10 text-[9px] text-neutral-400 font-mono">London</span>
+                            <div className="h-2 bg-blue-500 rounded-full" style={{ width: "40%" }} />
+                            <span className="text-[9px] text-white">18°C</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-10 text-[9px] text-neutral-400 font-mono">Tokyo</span>
+                            <div className="h-2 bg-green-500 rounded-full" style={{ width: "65%" }} />
+                            <span className="text-[9px] text-white">26°C</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-[10px] opacity-40">
+                      <span>Structured output schema parsed</span>
+                      <span>12ms latency</span>
+                    </div>
                   </motion.div>
                 </div>
               </div>
