@@ -56,6 +56,16 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showLiveDemo, setShowLiveDemo] = useState(false);
+  const [activeInsight, setActiveInsight] = useState(null);
+  const [showInsideView, setShowInsideView] = useState(false);
+
+  const focusSearchBar = () => {
+    const el = document.querySelector('input[placeholder*="Ask about anything"]');
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => el.focus(), 800);
+    }
+  };
 
   useEffect(() => {
     const t = setTimeout(() => setHeroReady(true), 2100);
@@ -86,25 +96,23 @@ function App() {
   }, [selectedDomains, showLiveDemo]);
 
   // Handle live search POST request
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const handleSearch = async (overrideQuery = null) => {
+    const targetQuery = typeof overrideQuery === "string" ? overrideQuery : searchQuery;
+    if (!targetQuery.trim()) return;
     setIsSearching(true);
     setErrorMsg("");
     try {
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchQuery.trim() })
+        body: JSON.stringify({ query: targetQuery.trim() })
       });
       if (res.ok) {
         const data = await res.json();
         setSearchResults((prev) => [data, ...prev]);
+        setActiveInsight(data);
+        setShowInsideView(true);
         setSearchQuery("");
-        setShowLiveDemo(true);
-        setTimeout(() => {
-          const el = document.getElementById("live-dashboard");
-          if (el) el.scrollIntoView({ behavior: "smooth" });
-        }, 100);
       } else {
         setErrorMsg("Couldn't find live data for that — try rephrasing your search.");
       }
@@ -138,6 +146,17 @@ function App() {
     }
   };
 
+  if (showInsideView && activeInsight) {
+    return (
+      <InsideDashboard 
+        insight={activeInsight} 
+        onClose={() => setShowInsideView(false)} 
+        onSearch={handleSearch}
+        isSearching={isSearching}
+      />
+    );
+  }
+
   return (
     <div className="relative w-full bg-black text-[#f5f5f5] font-display antialiased overflow-hidden">
       {/* Hero */}
@@ -152,6 +171,21 @@ function App() {
               <a
                 key={item.label}
                 href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (item.label === "Feed") {
+                    focusSearchBar();
+                  } else if (item.label === "How it works") {
+                    const el = document.getElementById("how-it-works-announcements");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  } else if (item.label === "Domains") {
+                    const el = document.getElementById("domains-pricing");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  } else if (item.label === "About") {
+                    const el = document.getElementById("about-pipeline");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
                 className={`text-[15px] text-neutral-100 ${item.active ? "opacity-100" : "opacity-50"} hover:opacity-100 transition-opacity anim-rise`}
                 style={{ animationDelay: `${600 + i * 60}ms` }}
               >
@@ -161,26 +195,16 @@ function App() {
           </nav>
           <div className="ml-auto hidden md:flex items-center gap-4 anim-pop" style={{ animationDelay: "900ms" }}>
             <button
-              onClick={() => {
-                const nextState = !showLiveDemo;
-                setShowLiveDemo(nextState);
-                if (nextState) {
-                  setTimeout(() => {
-                    const el = document.getElementById("live-dashboard");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }, 100);
-                }
-              }}
+              onClick={focusSearchBar}
               className="bg-transparent text-white border border-white/20 rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-white/10 transition-colors cursor-pointer"
             >
-              {showLiveDemo ? "Hide Live Demo" : "See Actual Working"}
+              See Actual Working
             </button>
             <button 
-              onClick={handleGenerateFeed}
-              disabled={isGenerating}
+              onClick={focusSearchBar}
               className="bg-white text-black rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-neutral-200 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              {isGenerating ? "Regenerating..." : "Try PulseFeed"}
+              Try PulseFeed
             </button>
           </div>
           {/* Mobile burger */}
@@ -214,7 +238,22 @@ function App() {
                 <a
                   key={item.label}
                   href="#"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMenuOpen(false);
+                    if (item.label === "Feed") {
+                      focusSearchBar();
+                    } else if (item.label === "How it works") {
+                      const el = document.getElementById("how-it-works-announcements");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    } else if (item.label === "Domains") {
+                      const el = document.getElementById("domains-pricing");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    } else if (item.label === "About") {
+                      const el = document.getElementById("about-pipeline");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }}
                   className="text-3xl text-neutral-100 font-medium"
                 >
                   {item.label}
@@ -222,10 +261,10 @@ function App() {
               ))}
             </nav>
             <button 
-              onClick={() => { setMenuOpen(false); handleGenerateFeed(); }}
+              onClick={() => { setMenuOpen(false); focusSearchBar(); }}
               className="mt-auto bg-white text-black rounded-lg py-4 text-base font-medium"
             >
-              {isGenerating ? "Regenerating Feed..." : "Try PulseFeed"}
+              Try PulseFeed
             </button>
           </div>
         )}
@@ -547,70 +586,7 @@ function App() {
         <div className="absolute bottom-0 left-0 w-full h-[300px] bg-gradient-to-t from-black via-black/90 to-transparent pointer-events-none z-50" />
       </div>
 
-      {/* Dynamic Insights Feed Dashboard Section */}
-      {showLiveDemo && (
-        <section id="live-dashboard" className="max-w-4xl mx-auto px-6 py-20 border-t border-white/10 scroll-mt-6">
-          <div className="flex flex-col gap-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
-              <div>
-                <h2 className="text-3xl font-medium text-white mb-2">Live Insights Feed</h2>
-                <p className="text-neutral-400 text-sm">Grounded real-time visual insights.</p>
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-3">
-                {/* Domain filtering buttons */}
-                <button
-                  onClick={() => toggleDomain("movies")}
-                  className={`text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors cursor-pointer ${
-                    selectedDomains.includes("movies") ? "bg-[#2b5c8f] text-white" : "bg-neutral-900 text-neutral-400"
-                  }`}
-                >
-                  Movies
-                </button>
-                <button
-                  onClick={() => toggleDomain("weather")}
-                  className={`text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors cursor-pointer ${
-                    selectedDomains.includes("weather") ? "bg-[#2b8f5c] text-white" : "bg-neutral-900 text-neutral-400"
-                  }`}
-                >
-                  Weather
-                </button>
-                <button
-                  onClick={handleGenerateFeed}
-                  disabled={isGenerating}
-                  className="bg-neutral-100 hover:bg-neutral-200 text-black text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors disabled:opacity-50 cursor-pointer"
-                >
-                  {isGenerating ? "Regenerating..." : "Refresh feed"}
-                </button>
-              </div>
-            </div>
 
-            {/* Render search results */}
-            {searchResults.length > 0 && (
-              <div className="flex flex-col gap-6">
-                <h3 className="text-xl font-medium text-red-400 uppercase tracking-wider">Live Search Results</h3>
-                {searchResults.map((item, idx) => (
-                  <InsightCard key={`search-${idx}`} insight={item} isLive={true} />
-                ))}
-              </div>
-            )}
-
-            {/* Render main insights feed */}
-            <div className="flex flex-col gap-6">
-              <h3 className="text-xl font-medium text-neutral-400 uppercase tracking-wider">Feed Insights</h3>
-              {insights.length === 0 ? (
-                <div className="text-center py-12 bg-neutral-900/40 rounded-2xl border border-white/5 text-neutral-500 text-sm">
-                  No insights found matching filter. Click Refresh Feed to create some.
-                </div>
-              ) : (
-                insights.map((item) => (
-                  <InsightCard key={item.id} insight={item} isLive={false} />
-                ))
-              )}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Features section */}
       <section className="px-[20px] pt-[80px] pb-[120px]">
@@ -779,7 +755,7 @@ function App() {
 
       {/* Domains section */}
       <section className="bg-black p-5">
-        <div className="rounded-3xl px-8 py-12 sm:px-20 sm:py-20 max-w-7xl mx-auto text-left" style={{ backgroundColor: "#D8D0BC" }}>
+        <div id="domains-pricing" className="rounded-3xl px-8 py-12 sm:px-20 sm:py-20 max-w-7xl mx-auto text-left" style={{ backgroundColor: "#D8D0BC" }}>
           <WordsReveal
             as="h2"
             className="text-5xl lg:text-6xl text-stone-950 text-center mb-20 block font-medium"
@@ -800,13 +776,7 @@ function App() {
               ]}
               cta="View live feed"
               ctaClass="bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
-              onClick={() => {
-                setShowLiveDemo(true);
-                setTimeout(() => {
-                  const el = document.getElementById("live-dashboard");
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
-                }, 100);
-              }}
+              onClick={focusSearchBar}
             />
             <PricingPlan
               price="Ask Anything"
@@ -819,13 +789,7 @@ function App() {
               ]}
               cta="Try a live search"
               ctaClass="bg-transparent text-stone-950 border border-stone-950/50 hover:bg-stone-950/10 transition-colors"
-              onClick={() => {
-                const el = document.querySelector('input[type="text"]');
-                if (el) {
-                  el.focus();
-                  el.scrollIntoView({ behavior: "smooth", block: "center" });
-                }
-              }}
+              onClick={focusSearchBar}
             />
           </div>
 
@@ -942,6 +906,7 @@ function App() {
 
       {/* Footer */}
       <motion.footer
+        id="about-pipeline"
         className="bg-black border-t-2 border-neutral-100/20 text-left"
         initial="hidden"
         whileInView="visible"
@@ -1180,12 +1145,10 @@ function SectionHeader() {
         <span className="text-lg text-neutral-400 font-medium">No more scrolling text</span>
         <button 
           onClick={() => {
-            const el = document.getElementById("live-dashboard");
+            const el = document.querySelector('input[placeholder*="Ask about anything"]');
             if (el) {
-              el.scrollIntoView({ behavior: "smooth" });
-            } else {
-              const trigger = document.querySelector('[class*="cursor-pointer"]');
-              if (trigger) trigger.click();
+              el.scrollIntoView({ behavior: "smooth", block: "center" });
+              setTimeout(() => el.focus(), 800);
             }
           }}
           className="bg-white text-stone-950 px-6 py-3 rounded-xl font-medium hover:bg-neutral-200 transition-colors cursor-pointer"
@@ -1553,6 +1516,336 @@ function StatsSection() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
+  const [insideSearchQuery, setInsideSearchQuery] = useState("");
+
+  const handleInsideSearch = () => {
+    if (!insideSearchQuery.trim()) return;
+    onSearch(insideSearchQuery.trim());
+    setInsideSearchQuery("");
+  };
+
+  const { query, domain, caption, confidence, chart_type, data_points = [], sources = [] } = insight;
+
+  const confidencePercent = confidence === "high" ? 94 : confidence === "medium" ? 76 : 38;
+  const dataPointsCount = data_points && data_points.length > 0 ? data_points.length : 3;
+
+  return (
+    <div className="flex h-screen w-full bg-black text-[#f5f5f5] font-display antialiased overflow-hidden select-none">
+      
+      {/* Sidebar Navigation */}
+      <aside className="w-56 bg-black border-r border-white/10 flex flex-col justify-between py-6 px-4 z-50 shrink-0 text-left">
+        <div className="flex flex-col gap-8">
+          <div className="flex items-center gap-3">
+            <img src={logoUrl} alt="Logo" width={32} height={32} />
+            <span className="text-lg font-medium text-neutral-100 font-display">PulseFeed</span>
+          </div>
+
+          <nav className="flex flex-col gap-1.5">
+            {[
+              { label: "Feed", active: false, icon: "feed", action: onClose },
+              { label: "Filters", active: false, icon: "filter_list" },
+              { label: "Search", active: true, icon: "search" },
+              { label: "All Insights", active: false, icon: "database" },
+            ].map((item, idx) => (
+              <button
+                key={idx}
+                onClick={item.action}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer text-left ${
+                  item.active 
+                    ? "bg-white/10 text-white border border-white/5" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <span className="material-symbols-outlined text-lg">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        <div>
+          <button 
+            onClick={onClose}
+            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-3 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+          >
+            Back to Home
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Canvas Dashboard */}
+      <main className="flex-grow flex flex-col relative h-full overflow-hidden bg-[#0A090A]">
+        
+        {/* Top Header */}
+        <header className="h-16 border-b border-white/10 flex justify-between items-center px-8 shrink-0 bg-black/40">
+          <div className="flex flex-col text-left">
+            <span className="text-xs uppercase font-mono tracking-widest text-neutral-400 font-semibold leading-none">Internal View</span>
+            <span className="text-sm font-medium text-white mt-1">PulseFeed Interactive Dashboard</span>
+          </div>
+
+          {/* Search bar inside header */}
+          <div className="w-96 relative flex items-center gap-3">
+            <input 
+              type="text" 
+              placeholder="Search another topic..." 
+              value={insideSearchQuery}
+              onChange={(e) => setInsideSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleInsideSearch()}
+              className="w-full bg-[#131113] border border-white/10 rounded-xl px-4 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white/30 transition-colors"
+            />
+            <button
+              onClick={handleInsideSearch}
+              disabled={isSearching}
+              className="bg-white hover:bg-neutral-200 text-black text-xs font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50 cursor-pointer shrink-0"
+            >
+              {isSearching ? "Searching..." : "Search"}
+            </button>
+          </div>
+        </header>
+
+        {/* Bento grid content */}
+        <section className="flex-1 p-6 overflow-y-auto space-y-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-12 gap-5">
+            
+            {/* Row 1: Card 1 (Beige), Card 2 (Pink), Card 3 (Grounded Sources) */}
+            
+            {/* Card 1 - Beige */}
+            <div className="col-span-12 md:col-span-5 h-[190px] relative bg-[#D0C9B9] rounded-2xl overflow-hidden p-5 flex flex-col justify-between text-[#131113] text-left">
+              <div className="flex justify-between relative z-10">
+                <div className="flex flex-col">
+                  <span className="text-xs opacity-40 block font-mono">Live Insight</span>
+                  <span className="text-2xl font-medium mt-1 block">1 Generated</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-xs opacity-40 block font-mono">Confidence</span>
+                  <span className="text-2xl font-medium mt-1">{confidencePercent}%</span>
+                </div>
+              </div>
+              <div className="flex justify-between w-full mt-3 relative z-10 text-xs font-medium">
+                <span className="text-stone-950 uppercase">{domain || "Grounded Query"}</span>
+                <span className="opacity-40">{confidence.toUpperCase()} CONFIDENCE</span>
+              </div>
+              <img src={dashLine.url} alt="" className="absolute inset-0 w-full h-full object-cover scale-[1.015] origin-center pointer-events-none z-0 opacity-80" />
+            </div>
+
+            {/* Card 2 - Pink */}
+            <div className="col-span-12 md:col-span-3 h-[190px] relative rounded-2xl overflow-hidden flex flex-col justify-center items-center">
+              <img src={dashCard3Pink.url} alt="" className="absolute inset-0 w-full h-full object-cover z-0" />
+              <div className="relative z-10 flex flex-col items-center">
+                <span className="text-3xl font-medium text-neutral-900 font-mono">
+                  {dataPointsCount}
+                </span>
+                <span className="text-sm text-neutral-900/60 mt-1 font-medium">
+                  Data points analyzed
+                </span>
+              </div>
+            </div>
+
+            {/* Card 3 - Grounded Sources */}
+            <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none bg-[#0F0D0F]">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block font-mono">Data Pipeline</span>
+                <span className="text-lg font-medium text-white block">Grounded Sources</span>
+              </div>
+
+              <div className="flex justify-between items-center gap-2 my-1">
+                {/* OMDb API */}
+                <div className={`h-12 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-colors ${
+                  sources.some(s => s.toLowerCase().includes("omdb") || s.toLowerCase().includes("movie"))
+                    ? "bg-[#6366f1]/10 border-[#6366f1]/40" 
+                    : "bg-white/5 border-white/10"
+                }`}>
+                  <span className="text-[9px] text-yellow-500 font-bold uppercase font-mono">OMDb</span>
+                  <span className="text-[7px] text-neutral-400 font-semibold">Movies</span>
+                </div>
+                {/* OpenWeather */}
+                <div className={`h-12 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-colors ${
+                  sources.some(s => s.toLowerCase().includes("weather") || s.toLowerCase().includes("temp"))
+                    ? "bg-[#6366f1]/10 border-[#6366f1]/40" 
+                    : "bg-white/5 border-white/10"
+                }`}>
+                  <span className="text-xs text-blue-400 font-bold leading-none">☁️</span>
+                  <span className="text-[7px] text-neutral-400 font-semibold mt-0.5">Weather</span>
+                </div>
+                {/* Google Search */}
+                <div className={`h-12 flex-1 rounded-xl border flex flex-col items-center justify-center p-1 text-center transition-colors ${
+                  sources.some(s => s.toLowerCase().includes("google") || s.toLowerCase().includes("search") || s.toLowerCase().includes("grounding"))
+                    ? "bg-[#6366f1]/10 border-[#6366f1]/40" 
+                    : "bg-white/5 border-white/10"
+                }`}>
+                  <span className="text-xs text-red-400 font-bold leading-none">G</span>
+                  <span className="text-[7px] text-neutral-400 font-semibold mt-0.5">Google</span>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <span className="text-[10px] font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">+ 4 integrations</span>
+              </div>
+            </div>
+
+            {/* Row 2: Card 4 (Queries Run), Card 5 (Visualization Engine / Dynamic Chart) */}
+
+            {/* Card 4 - Live Monitor */}
+            <div className="col-span-12 md:col-span-4 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none bg-[#0F0D0F]">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block font-mono">Live Stream</span>
+                <span className="text-lg font-medium text-white block">Queries Run</span>
+              </div>
+
+              <div className="flex flex-col gap-1.5 font-mono text-[8px] leading-normal text-neutral-300 bg-black/40 border border-white/5 p-2.5 rounded-xl h-18 overflow-hidden my-1">
+                <div className="flex justify-between border-b border-white/5 pb-1">
+                  <span className="text-green-400">GET /api/search</span>
+                  <span className="text-neutral-500">200 OK</span>
+                </div>
+                <div className="text-neutral-400 truncate">&gt; query: "{query}"</div>
+                <div className="text-neutral-500 truncate">&gt; chart: {chart_type}</div>
+              </div>
+
+              <div className="flex justify-between items-center text-[10px] opacity-40">
+                <span>Status: Listening</span>
+                <span className="size-2 rounded-full bg-green-500 animate-pulse"></span>
+              </div>
+            </div>
+
+            {/* Card 5 - Visualization Engine / Interactive Chart Output */}
+            <div className="col-span-12 md:col-span-8 h-[190px] rounded-2xl border border-white/10 p-5 flex flex-col justify-between text-left select-none bg-[#0F0D0F]">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block font-mono">Visualization Engine</span>
+                <span className="text-lg font-medium text-white block">Raw Data to Instant Chart</span>
+              </div>
+
+              {/* Render dynamic charts inside mockup Card 5 */}
+              <div className="grid grid-cols-3 gap-4 my-1 items-center">
+                {/* Left: Input */}
+                <div className="bg-white/5 border border-white/10 p-2.5 rounded-xl flex flex-col gap-1 h-[68px] justify-center">
+                  <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold">User Search</span>
+                  <p className="text-[10px] text-white leading-tight font-medium italic truncate">"{query}"</p>
+                </div>
+
+                {/* Middle: AI Parser */}
+                <div className="flex flex-col items-center justify-center gap-1 h-[68px]">
+                  <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold">Gemini Parser</span>
+                  <svg className="w-4 h-4 text-neutral-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                  <span className="text-[8px] bg-blue-500/10 text-blue-400 border border-blue-500/25 px-1.5 py-0.5 rounded leading-none">Grounded Schema</span>
+                </div>
+
+                {/* Right: Output Chart */}
+                <div className="bg-white/5 border border-white/10 p-2.5 rounded-xl flex flex-col gap-1 h-[68px] justify-center text-[10px]">
+                  <span className="text-[8px] uppercase tracking-wider text-neutral-400 font-semibold font-mono">Live Chart</span>
+                  
+                  {chart_type === "comparison_bar" && data_points.length > 0 ? (
+                    <div className="flex flex-col gap-1 overflow-hidden">
+                      {data_points.slice(0, 2).map((pt, i) => (
+                        <div key={i} className="flex items-center gap-1.5">
+                          <span className="w-8 text-[8px] text-neutral-400 font-mono truncate">{pt.label}</span>
+                          <div className={`h-1 rounded-full flex-1 ${i === 0 ? "bg-blue-500" : "bg-green-500"}`} style={{ maxWidth: `${Math.min(100, (pt.value / Math.max(...data_points.map(p => p.value || 1))) * 100)}%` }} />
+                          <span className="text-[8px] text-white font-mono">{pt.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : chart_type === "trend_line" && data_points.length > 0 ? (
+                    <div className="relative h-6 w-full flex items-end">
+                      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                        <path
+                          d={`M ${data_points.map((pt, idx) => `${(idx / (data_points.length - 1)) * 100}%,${100 - (pt.value / Math.max(...data_points.map(p => p.value || 1))) * 80}%`).join(" L ")}`}
+                          fill="none"
+                          stroke="#6366f1"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="text-[9px] text-neutral-400 italic font-medium leading-none truncate">Text insights resolved</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center text-[10px] opacity-40">
+                <span>Structured output schema parsed</span>
+                <span>12ms latency</span>
+              </div>
+            </div>
+
+            {/* Row 3: AI News Reader Card (12-columns, full visual grounded display) */}
+            <div className="col-span-12 rounded-2xl border border-white/10 p-6 flex flex-col gap-6 text-left bg-[#0F0D0F] relative overflow-hidden">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider block font-mono">Grounded Source Reader</span>
+                  <h3 className="text-2xl font-medium text-white block mt-1">AI news reader</h3>
+                </div>
+                <span className="bg-[#6366f1]/10 text-[#6366f1] border border-[#6366f1]/25 text-xs font-semibold px-3.5 py-1.5 rounded-lg uppercase tracking-wider font-mono">
+                  MULTIPLE SOURCES CITED
+                </span>
+              </div>
+
+              {/* News representation layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-t border-white/5 pt-6">
+                
+                {/* News Picture visualization block */}
+                <div className="lg:col-span-5 relative rounded-xl overflow-hidden bg-[#0A090A] border border-white/5 min-h-[220px] flex items-center justify-center">
+                  {/* Dynamic weather graphic, movie poster, or generic neon blueprint background */}
+                  {domain === "weather" ? (
+                    <div className="flex flex-col items-center justify-center p-6 text-center">
+                      <span className="text-6xl text-blue-400 animate-bounce">☁️</span>
+                      <span className="text-sm font-semibold text-white mt-4 uppercase tracking-widest font-mono">Live Weather Conditions</span>
+                    </div>
+                  ) : domain === "movies" && data_points.length > 0 ? (
+                    <div className="flex gap-4 p-4 items-center justify-center">
+                      {data_points.map((pt, i) => (
+                        <div key={i} className="flex flex-col items-center gap-1.5">
+                          <div className="w-16 h-24 rounded-lg overflow-hidden bg-neutral-900 border border-white/10 flex items-center justify-center text-center">
+                            {pt.image_url ? (
+                              <img src={pt.image_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-[10px] text-neutral-500 font-bold uppercase font-mono">OMDb</span>
+                            )}
+                          </div>
+                          <span className="text-[9px] text-neutral-400 truncate w-16 font-mono text-center">{pt.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 bg-cover bg-center opacity-30 select-none pointer-events-none" style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_11QE9Hc3LBDtWGNO1v4Eo5ysLxvFeAIKXVzQffaEUFoGqEJXCq__THNKULccJ0hHxwaMrv0Cu5YdMY2ZNuIOvLhruIsf-nikm2T2L5wv_N82qBhiZZh9RoNllGW0erWyPdaStZOM79OiLBFRQZ_TVDw-oA_X7OSONh45IWqQBp0BPnCQplqSJtFKjyXQliYzddEmiPw9He74TaCAA1b2iYzOk-3j5d5wPokCu1kQh8utz9-X8g')` }} />
+                  )}
+                  
+                  {/* Decorative ping node elements */}
+                  <div className="absolute top-[20%] left-[30%] w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                  <div className="absolute bottom-[30%] right-[25%] w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                </div>
+
+                {/* News content right details */}
+                <div className="lg:col-span-7 flex flex-col justify-between h-full gap-4">
+                  <div className="flex flex-col gap-4">
+                    <p className="text-neutral-100 text-lg leading-relaxed font-normal">
+                      {caption}
+                    </p>
+                  </div>
+
+                  {/* Sources tag list */}
+                  {sources && sources.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
+                      <span className="font-semibold text-neutral-300">Verified Sources:</span>
+                      {sources.map((src, i) => (
+                        <span key={i} className="bg-white/5 border border-white/10 px-2.5 py-1 rounded text-neutral-300 font-mono truncate max-w-[200px]" title={src}>
+                          {src.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }
 
