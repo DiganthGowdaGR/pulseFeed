@@ -989,106 +989,13 @@ function App() {
             </div>
           </motion.div>
 
-          <div className="flex flex-col gap-0">
-            {[
-              {
-                step: "01",
-                title: "Query Input",
-                desc: "You type a topic — a movie, a weather comparison, a market stat. PulseFeed parses your intent and classifies the domain.",
-                color: "from-violet-500/20 to-transparent",
-                dot: "bg-violet-400",
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                  </svg>
-                )
-              },
-              {
-                step: "02",
-                title: "Source Selection",
-                desc: "The AI engine picks the right data layer — structured data feeds for clean numeric domains, or live search grounding for open-ended topics.",
-                color: "from-blue-500/20 to-transparent",
-                dot: "bg-blue-400",
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
-                )
-              },
-              {
-                step: "03",
-                title: "Data Grounding",
-                desc: "Real facts are fetched and cross-referenced across multiple sources. No hallucinations — if a number can't be verified, confidence is marked low.",
-                color: "from-emerald-500/20 to-transparent",
-                dot: "bg-emerald-400",
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                  </svg>
-                )
-              },
-              {
-                step: "04",
-                title: "Structured Output",
-                desc: "Results are serialised into a strict JSON schema — chart type, data points, caption, confidence score, and cited sources. Nothing reaches the UI unverified.",
-                color: "from-amber-500/20 to-transparent",
-                dot: "bg-amber-400",
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-                  </svg>
-                )
-              },
-              {
-                step: "05",
-                title: "Visual Render",
-                desc: "The structured data is mapped into the bento card layout — a comparison chart, a news reader, source tags, and confidence indicators — rendered live in your browser.",
-                color: "from-rose-500/20 to-transparent",
-                dot: "bg-rose-400",
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="3" y1="9" x2="21" y2="9"/>
-                    <line x1="9" y1="21" x2="9" y2="9"/>
-                  </svg>
-                )
-              }
-            ].map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.55, delay: i * 0.1, ease: "easeOut" }}
-                className="flex gap-6 group"
-              >
-                {/* Left: step number + connector line */}
-                <div className="flex flex-col items-center pt-1">
-                  <div className={`size-2 rounded-full ${item.dot} mt-1.5 shrink-0`} />
-                  {i < 4 && <div className="w-px flex-1 bg-white/8 my-2" />}
-                </div>
-                {/* Right: content card */}
-                <div className={`flex-1 bg-gradient-to-br ${item.color} border border-white/5 rounded-2xl p-6 mb-4 hover:border-white/10 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="size-8 rounded-lg bg-white/5 border border-white/8 flex items-center justify-center text-neutral-400">
-                      {item.icon}
-                    </div>
-                    <span className="text-[11px] font-mono text-neutral-500 tracking-widest uppercase">Step {item.step}</span>
-                    <span className="text-base font-semibold text-neutral-100">{item.title}</span>
-                  </div>
-                  <p className="text-base text-neutral-400 leading-7 pl-11">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
           {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex items-center gap-4"
+            className="flex items-center gap-4 mt-8"
           >
             <button
               onClick={() => {

@@ -179,3 +179,30 @@ def generate_feed():
     except Exception as e:
         print(f"Error generating insights feed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# ─── Static Frontend Serving (Production) ─────────────────────────────────────
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+frontend_dist = os.path.join(workspace_root, "frontend", "dist")
+if os.path.exists(frontend_dist):
+    # Serve assets under /assets or static files
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+
+    # Fallback to serve index.html for spa routing
+    @app.get("/")
+    def serve_root():
+        index_file = os.path.join(frontend_dist, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Frontend build index not found")
+
+    @app.get("/{catchall:path}")
+    def serve_frontend(catchall: str):
+        # Prevent catching API endpoints
+        if catchall.startswith("api"):
+            raise HTTPException(status_code=404, detail="Not Found")
+        index_file = os.path.join(frontend_dist, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Frontend build index not found")

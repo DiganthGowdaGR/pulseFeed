@@ -1,85 +1,108 @@
-# PulseFeed - Backend Services
+# PulseFeed — AI-Generated Visual Insights
 
-PulseFeed is an automated insight gathering and analysis pipeline. This repository houses the backend services, connectivity tests, and pipeline scripts responsible for fetching, comparing, and persisting data insights from external APIs using Google Gemini 2.5 Flash.
+PulseFeed is an automated data gathering, analysis, and visual presentation system. It parses queries (e.g. comparing weather, movies, financial data, or open-ended topics), cross-references multiple live sources, and renders premium visual insights in a modular dashboard.
 
-## Project Structure
+---
+
+## 🚀 Key Features
+
+1. **Access Gate & Privacy**: Gated evaluation portal with a secure, timing-safe HMAC token validator (`PULSEFEED_ACCESS_CODE`) and rate limiting (10 attempts per hour).
+2. **Waitlist Integration**: Visitor signup pipeline stored directly in a Supabase table with Row-Level Security (RLS) policies.
+3. **Structured API pipeline**: Uses Gemini 2.5 Flash with strict `pydantic` schemas for guaranteed JSON outputs (chart type, confidence scores, verified citations).
+4. **Historical Insights Library**: Persistent Firestore archiving allows reviewing previously generated query insights.
+
+---
+
+## 📁 Repository Structure
+
 ```text
-pulsefeed/
-  .env                  # Local secrets and config (not committed)
-  .env.example          # Template configuration
-  .gitignore            # Standard git excludes
-  requirements.txt      # Project dependencies
-  tests/
-    test_firestore.py   # Connection check for Firebase Firestore
-    test_omdb.py        # Connection check for OMDb movie API
-    test_weather.py     # Connection check for OpenWeatherMap API
-    test_gemini.py      # Connection check for Gemini API (google-genai SDK)
-  pipeline/
-    common.py           # Shared Firestore save and query helpers
-    movie_insight.py    # OMDb data fetching and Gemini movie comparisons
-    weather_insight.py  # OpenWeatherMap data & today's rain probability comparison
-    run_all.py          # Complete sequential runner of all insight pipelines
-```
-
-## Features Implemented
-1. **API Connectivity Checks**: Stanadlone test scripts verifying Firestore, OMDb, OpenWeatherMap, and Gemini SDKs are working.
-2. **Structured Gemini Outputs**: Leveraged `pydantic` schemas coupled with the new `google-genai` SDK structured outputs to guarantee API models respond strictly in JSON format.
-3. **Weather Forecast Parsing**: Aggregates the maximum precipitation probability (`pop`) for "Today" from 3-hour interval weather forecasts.
-4. **Shared Persistence Layer**: Refactored Firestore database collection writes and queries (`save_insight_to_firestore`, `get_all_insights`) into a single, modular `common.py`.
-5. **Batch Generation Suite**: `run_all.py` permits running the entire data harvesting and analysis lifecycle in a single execution.
-
-## Getting Started
-
-### 1. Setup Environment
-Copy `.env.example` to `.env` and fill in your API credentials:
-```bash
-cp pulsefeed/.env.example pulsefeed/.env
-```
-
-### 2. Backend Installation & Run
-Install python dependencies:
-```bash
-pip install -r pulsefeed/requirements.txt
-```
-
-Run backend connectivity checks:
-```bash
-python pulsefeed/tests/test_firestore.py
-python pulsefeed/tests/test_omdb.py
-python pulsefeed/tests/test_weather.py
-python pulsefeed/tests/test_gemini.py
-python pulsefeed/tests/test_gemini_fallback.py
-```
-
-Start the FastAPI backend server (runs on `http://127.0.0.1:8000`):
-```bash
-python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+├── backend/
+│   └── main.py             # FastAPI App containing API endpoints and rate limiters
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx         # Landing page, Access Gate modal, & Dashboard logic
+│   │   └── main.jsx        # App entry point
+│   ├── vite.config.js      # Dev proxy configuration
+│   └── package.json        # Frontend Node project files
+├── pulsefeed/
+│   ├── .env                # Local secrets and keys (not committed)
+│   ├── pipeline/
+│   │   ├── common.py       # Firestore integration logic
+│   │   ├── search_insight.py # Multi-source grounding engine
+│   │   └── run_all.py      # Scheduled batch crawler
+│   └── tests/              # Individual service connectivity tests
+├── api/
+│   ├── index.py            # Vercel serverless function entrypoint
+│   └── requirements.txt    # Vercel serverless function dependencies
+├── Dockerfile              # Monorepo multi-stage build script
+├── vercel.json             # Vercel routing and frontend builder configuration
+├── requirements.txt        # Root level Python backend requirements
+└── supabase_setup.sql      # Supabase waitlist table creation and RLS setup
 ```
 
 ---
 
-### 3. Frontend Selection (React or Streamlit)
+## 🛠️ Getting Started
 
-#### Option A: Premium React UI (Recommended)
-This features a pixel-perfect, animated dark-mode landing page powered by Vite, Tailwind CSS v4, and Framer Motion. It links directly to the FastAPI server for live search and feed refresh.
+### 1. Setup Environment
+Create a `.env` file inside `pulsefeed/` using the following keys:
+```ini
+# Firebase Firestore Configuration
+FIRESTORE_PROJECT_ID="your-project-id"
+GOOGLE_APPLICATION_CREDENTIALS="path/to/firestore-credentials.json"
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install npm dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the development server (runs locally on `http://localhost:5173`):
-   ```bash
-   npm run dev
-   ```
+# API keys
+OMDB_API_KEY="your-omdb-key"
+WEATHER_API_KEY="your-openweathermap-key"
+GEMINI_API_KEY="your-gemini-api-key"
 
-#### Option B: Minimalist Streamlit Interface
-A simple, Python-native Streamlit dashboard displaying visual insight grids.
+# Supabase Waitlist Database (Rest API client)
+SUPABASE_URL="https://your-ref-id.supabase.co"
+SUPABASE_ANON_KEY="your-anon-public-key"
 
-Start the Streamlit application (runs locally on `http://localhost:8501`):
-```bash
-python -m streamlit run app.py --server.headless=true
+# Secure Evaluation Gate Access Code
+PULSEFEED_ACCESS_CODE="06091978"
+ACCESS_GATE_MAX_ATTEMPTS=10
 ```
+
+### 2. Supabase Table Setup
+Run the SQL queries from [supabase_setup.sql](file:///c:/Users/deeks/OneDrive/Documents/NewFetcher/supabase_setup.sql) in your Supabase SQL Editor. This initializes the `waitlist` table and enforces Row-Level Security (RLS) to protect user signups.
+
+### 3. Local Development
+
+#### Start Backend API Server
+Install dependencies and run FastAPI on port 8000:
+```bash
+pip install -r requirements.txt
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+#### Start Frontend Client
+In a separate terminal, install npm dependencies and run the Vite server:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open `http://localhost:5173` in your browser.
+
+---
+
+## 🐳 Production Deployment
+
+### Option A: Docker Deployment (Single Container)
+Builds both React and FastAPI apps and serves them from a single high-performance port:
+```bash
+# Build the unified container
+docker build -t pulsefeed .
+
+# Run the container (ensure env variables are passed)
+docker run -p 8000:8000 --env-file pulsefeed/.env pulsefeed
+```
+Your application will be live on `http://localhost:8000`.
+
+### Option B: Vercel Deployment
+Deploy the entire monorepo with one click on Vercel:
+1. Connect this repository to Vercel.
+2. The `vercel.json` config will automatically build the React assets and map `/api/*` to the Python serverless function at `/api/index.py`.
+3. Add the `.env` keys under **Vercel Project Settings > Environment Variables**.
