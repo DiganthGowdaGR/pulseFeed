@@ -200,7 +200,10 @@ function App() {
           </nav>
           <div className="ml-auto hidden md:flex items-center gap-4 anim-pop" style={{ animationDelay: "900ms" }}>
             <button
-              onClick={enterDashboardLive}
+              onClick={() => {
+                const el = document.getElementById("architecture");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
               disabled={isSearching}
               className="bg-transparent text-white border border-white/20 rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
             >
@@ -944,7 +947,32 @@ function App() {
             />
           </div>
 
-          {/* Pipeline steps */}
+          {/* Architecture Diagram Placeholder — replace with your design image */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="w-full"
+          >
+            <div className="w-full rounded-3xl border border-white/8 bg-neutral-950 overflow-hidden flex flex-col items-center justify-center min-h-[400px] relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-900/10 via-transparent to-blue-900/10" />
+              <div className="relative z-10 flex flex-col items-center gap-4 text-center px-8">
+                <div className="size-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-500">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <p className="text-xs font-mono text-neutral-500 tracking-widest uppercase">Architecture diagram</p>
+                  <p className="text-xs text-neutral-600 font-mono">— coming soon —</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           <div className="flex flex-col gap-0">
             {[
               {
