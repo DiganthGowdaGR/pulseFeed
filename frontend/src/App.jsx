@@ -59,6 +59,8 @@ function App() {
   const [activeInsight, setActiveInsight] = useState(null);
   const [showInsideView, setShowInsideView] = useState(false);
 
+  const [showGate, setShowGate] = useState(false);
+
   const focusSearchBar = () => {
     const el = document.querySelector('input[placeholder*="Ask about anything"]');
     if (el) {
@@ -67,7 +69,14 @@ function App() {
     }
   };
 
+  // Opens the access gate modal (gated entry into dashboard)
   const enterDashboardLive = () => {
+    setShowGate(true);
+  };
+
+  // Called when gate is passed successfully
+  const onGateSuccess = () => {
+    setShowGate(false);
     setShowInsideView(true);
   };
 
@@ -164,6 +173,13 @@ function App() {
 
   return (
     <div className="relative w-full bg-black text-[#f5f5f5] font-display antialiased overflow-hidden">
+      {/* Access Gate Modal */}
+      {showGate && (
+        <AccessGate
+          onSuccess={onGateSuccess}
+          onClose={() => setShowGate(false)}
+        />
+      )}
       {/* Hero */}
       <div className="relative">
         {/* Header */}
@@ -1086,7 +1102,6 @@ function App() {
                 <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
               </svg>
             </button>
-            <span className="text-sm text-neutral-500">No account required — runs live in the browser.</span>
           </motion.div>
         </div>
       </section>
@@ -1247,6 +1262,251 @@ function CountUpInView({ end, duration = 1200, delay = 0, active = true }) {
   }, [end, duration, delay, active, inView]);
   
   return <span ref={ref}>{count}</span>;
+}
+
+// ─── Access Gate Component ───────────────────────────────────────────────────
+function AccessGate({ onSuccess, onClose }) {
+  const [tab, setTab] = useState("waitlist"); // "waitlist" | "token"
+  // Waitlist state
+  const [wlName, setWlName] = useState("");
+  const [wlEmail, setWlEmail] = useState("");
+  const [wlStatus, setWlStatus] = useState(null); // null | "loading" | "success" | "error"
+  const [wlError, setWlError] = useState("");
+  // Token state
+  const [tokenInput, setTokenInput] = useState("");
+  const [tokenStatus, setTokenStatus] = useState(null); // null | "loading" | "error" | "locked"
+  const [tokenError, setTokenError] = useState("");
+  const [tokenAttempts, setTokenAttempts] = useState(0);
+  const MAX_FRONT_ATTEMPTS = 5;
+
+  const handleWaitlist = async (e) => {
+    e.preventDefault();
+    setWlStatus("loading");
+    setWlError("");
+    try {
+      const res = await fetch("/api/join-waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: wlName.trim(), email: wlEmail.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setWlStatus("success");
+      } else {
+        setWlStatus("error");
+        setWlError(data.detail || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setWlStatus("error");
+      setWlError("Network error — please check your connection.");
+    }
+  };
+
+  const handleToken = async (e) => {
+    e.preventDefault();
+    if (tokenAttempts >= MAX_FRONT_ATTEMPTS) {
+      setTokenStatus("locked");
+      return;
+    }
+    setTokenStatus("loading");
+    setTokenError("");
+    try {
+      const res = await fetch("/api/validate-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: tokenInput.trim() }),
+      });
+      if (res.ok) {
+        // Valid — enter the dashboard
+        onSuccess();
+        return;
+      }
+      const data = await res.json();
+      const newAttempts = tokenAttempts + 1;
+      setTokenAttempts(newAttempts);
+      if (res.status === 429 || newAttempts >= MAX_FRONT_ATTEMPTS) {
+        setTokenStatus("locked");
+        setTokenError("Too many attempts. Please try again later.");
+      } else {
+        setTokenStatus("error");
+        setTokenError(data.detail || "Invalid access code.");
+      }
+    } catch {
+      setTokenStatus("error");
+      setTokenError("Network error — please check your connection.");
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.85)", backdropFilter: "blur(16px)" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 20 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full max-w-md bg-[#0d0d0d] border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Top gradient glow */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-32 bg-violet-600/15 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 size-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/8 flex items-center justify-center text-neutral-400 hover:text-white transition-colors cursor-pointer z-10"
+          aria-label="Close"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+        <div className="p-8">
+          {/* Header */}
+          <div className="flex flex-col items-center gap-2 mb-8 text-center">
+            <div className="size-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-1">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-300">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-neutral-100">Access PulseFeed</h2>
+            <p className="text-sm text-neutral-500 leading-5">Join the waitlist or enter your access code to get inside.</p>
+          </div>
+
+          {/* Tab switcher */}
+          <div className="flex gap-1 bg-white/5 border border-white/8 rounded-xl p-1 mb-6">
+            {[
+              { id: "waitlist", label: "Join Waitlist" },
+              { id: "token", label: "Enter Access Code" },
+            ].map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
+                  tab === t.id
+                    ? "bg-white text-black shadow-sm"
+                    : "text-neutral-400 hover:text-neutral-200"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* ── Waitlist tab ── */}
+          {tab === "waitlist" && (
+            <div>
+              {wlStatus === "success" ? (
+                <div className="flex flex-col items-center gap-4 py-8 text-center">
+                  <div className="size-14 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-neutral-100">You're on the list!</p>
+                    <p className="text-sm text-neutral-500 mt-1">We'll reach out when your access is ready.</p>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleWaitlist} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Full Name</label>
+                    <input
+                      type="text"
+                      placeholder="Your name"
+                      value={wlName}
+                      onChange={(e) => setWlName(e.target.value)}
+                      required
+                      className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-white/25 focus:bg-white/8 transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Email Address</label>
+                    <input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={wlEmail}
+                      onChange={(e) => setWlEmail(e.target.value)}
+                      required
+                      className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-white/25 focus:bg-white/8 transition-colors"
+                    />
+                  </div>
+                  {wlStatus === "error" && (
+                    <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{wlError}</p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={wlStatus === "loading"}
+                    className="w-full bg-white text-black py-3 rounded-xl font-semibold text-sm hover:bg-neutral-100 transition-colors disabled:opacity-60 cursor-pointer mt-1"
+                  >
+                    {wlStatus === "loading" ? "Saving your spot…" : "Join Waitlist →"}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {/* ── Token tab ── */}
+          {tab === "token" && (
+            <div>
+              {tokenStatus === "locked" ? (
+                <div className="flex flex-col items-center gap-3 py-8 text-center">
+                  <div className="size-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-400">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                  </div>
+                  <p className="text-sm text-neutral-400 leading-6">Too many failed attempts.<br/>Please try again later.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleToken} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Access Code</label>
+                    <input
+                      type="password"
+                      placeholder="Enter your code"
+                      value={tokenInput}
+                      onChange={(e) => setTokenInput(e.target.value)}
+                      required
+                      autoComplete="off"
+                      className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-white/25 focus:bg-white/8 transition-colors tracking-widest font-mono"
+                    />
+                    <p className="text-[11px] text-neutral-600">For evaluation access — share your code to enter.</p>
+                  </div>
+                  {tokenStatus === "error" && (
+                    <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      {tokenError}
+                      {tokenAttempts > 0 && tokenAttempts < MAX_FRONT_ATTEMPTS && (
+                        <span className="ml-1 opacity-60">({MAX_FRONT_ATTEMPTS - tokenAttempts} attempt{MAX_FRONT_ATTEMPTS - tokenAttempts !== 1 ? "s" : ""} remaining)</span>
+                      )}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={tokenStatus === "loading"}
+                    className="w-full bg-violet-600 hover:bg-violet-500 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60 cursor-pointer mt-1"
+                  >
+                    {tokenStatus === "loading" ? "Verifying…" : "Access PulseFeed →"}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {/* Footer note */}
+          <p className="text-center text-[11px] text-neutral-600 mt-6">
+            Early access product · Limited availability
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  );
 }
 
 function WordsReveal({ text, className, step = 0.05, delay = 0, duration = 0.4, as: Component = "p" }) {
