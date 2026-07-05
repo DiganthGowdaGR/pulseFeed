@@ -36,7 +36,7 @@ app.add_middleware(
 # ─── Rate limiting store (in-memory per process) ─────────────────────────────
 # Maps IP -> list of attempt timestamps
 _attempt_log: dict = defaultdict(list)
-MAX_ATTEMPTS = int(os.getenv("ACCESS_GATE_MAX_ATTEMPTS", "5"))
+MAX_ATTEMPTS = int(os.getenv("ACCESS_GATE_MAX_ATTEMPTS", "10"))
 WINDOW_SECONDS = 3600  # 1 hour window
 
 def _is_rate_limited(ip: str) -> bool:

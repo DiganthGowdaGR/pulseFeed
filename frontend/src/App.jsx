@@ -1277,7 +1277,7 @@ function AccessGate({ onSuccess, onClose }) {
   const [tokenStatus, setTokenStatus] = useState(null); // null | "loading" | "error" | "locked"
   const [tokenError, setTokenError] = useState("");
   const [tokenAttempts, setTokenAttempts] = useState(0);
-  const MAX_FRONT_ATTEMPTS = 5;
+  const MAX_FRONT_ATTEMPTS = 10;
 
   const handleWaitlist = async (e) => {
     e.preventDefault();
