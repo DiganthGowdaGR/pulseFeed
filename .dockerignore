@@ -5,5 +5,4 @@ venv/
 .github/
 frontend/node_modules/
 frontend/dist/
-pulsefeed/.env
 *.log
