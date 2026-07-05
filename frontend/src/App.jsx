@@ -67,6 +67,10 @@ function App() {
     }
   };
 
+  const enterDashboardLive = () => {
+    handleSearch("movies");
+  };
+
   useEffect(() => {
     const t = setTimeout(() => setHeroReady(true), 2100);
     return () => clearTimeout(t);
@@ -195,16 +199,18 @@ function App() {
           </nav>
           <div className="ml-auto hidden md:flex items-center gap-4 anim-pop" style={{ animationDelay: "900ms" }}>
             <button
-              onClick={focusSearchBar}
-              className="bg-transparent text-white border border-white/20 rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-white/10 transition-colors cursor-pointer"
+              onClick={enterDashboardLive}
+              disabled={isSearching}
+              className="bg-transparent text-white border border-white/20 rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
             >
-              See Actual Working
+              {isSearching ? "Loading..." : "See Actual Working"}
             </button>
             <button 
-              onClick={focusSearchBar}
+              onClick={enterDashboardLive}
+              disabled={isSearching}
               className="bg-white text-black rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-neutral-200 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              Try PulseFeed
+              {isSearching ? "Loading..." : "Try PulseFeed"}
             </button>
           </div>
           {/* Mobile burger */}
@@ -242,7 +248,7 @@ function App() {
                     e.preventDefault();
                     setMenuOpen(false);
                     if (item.label === "Feed") {
-                      focusSearchBar();
+                      enterDashboardLive();
                     } else if (item.label === "How it works") {
                       const el = document.getElementById("how-it-works-announcements");
                       if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -261,10 +267,11 @@ function App() {
               ))}
             </nav>
             <button 
-              onClick={() => { setMenuOpen(false); focusSearchBar(); }}
-              className="mt-auto bg-white text-black rounded-lg py-4 text-base font-medium"
+              onClick={() => { setMenuOpen(false); enterDashboardLive(); }}
+              disabled={isSearching}
+              className="mt-auto bg-white text-black rounded-lg py-4 text-base font-medium disabled:opacity-50"
             >
-              Try PulseFeed
+              {isSearching ? "Loading..." : "Try PulseFeed"}
             </button>
           </div>
         )}
@@ -277,12 +284,19 @@ function App() {
               <div className="flex-1 flex items-center">
                 <img src={macDotUrl} alt="" width={60} height={12} />
               </div>
-              <div className="flex items-center gap-2 sm:gap-4">
-                <ToolIcon src={typeUrl} className="anim-rise" style={{ animationDelay: "1140ms" }} />
-                <ToolIcon src={imagePlusUrl} className="anim-rise" style={{ animationDelay: "1200ms" }} />
-                <ToolIcon src={mousePointerUrl} className="anim-rise" style={{ animationDelay: "1260ms" }} />
-                <ToolIcon src={squareUrl} className="anim-rise" style={{ animationDelay: "1320ms" }} />
-                <ToolIcon src={plusUrl} className="anim-rise" style={{ animationDelay: "1380ms" }} />
+              <div className="flex items-center gap-2 relative z-10 sm:gap-3 anim-rise" style={{ animationDelay: "1140ms" }}>
+                <div className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[9px] text-neutral-300 font-mono tracking-wider">
+                  <span className="size-1 rounded-full bg-yellow-500 animate-pulse"></span>
+                  API.OMDB
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[9px] text-neutral-300 font-mono tracking-wider">
+                  <span className="size-1 rounded-full bg-blue-400 animate-pulse"></span>
+                  API.WEATHER
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[9px] text-neutral-300 font-mono tracking-wider">
+                  <span className="size-1 rounded-full bg-red-400 animate-pulse"></span>
+                  GOOGLE.SEARCH
+                </div>
               </div>
               <div className="flex-1 flex items-center justify-end gap-4">
                 <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-[10px] px-4 py-1.5 transition-colors anim-pop" style={{ animationDelay: "1440ms" }}>
@@ -590,7 +604,7 @@ function App() {
 
       {/* Features section */}
       <section className="px-[20px] pt-[80px] pb-[120px]">
-        <SectionHeader />
+        <SectionHeader onTryNow={enterDashboardLive} />
         <FeatureCards />
       </section>
 
@@ -776,7 +790,7 @@ function App() {
               ]}
               cta="View live feed"
               ctaClass="bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
-              onClick={focusSearchBar}
+              onClick={enterDashboardLive}
             />
             <PricingPlan
               price="Ask Anything"
@@ -789,7 +803,7 @@ function App() {
               ]}
               cta="Try a live search"
               ctaClass="bg-transparent text-stone-950 border border-stone-950/50 hover:bg-stone-950/10 transition-colors"
-              onClick={focusSearchBar}
+              onClick={enterDashboardLive}
             />
           </div>
 
@@ -1132,7 +1146,7 @@ function PillReveal({ children, delay = 0 }) {
   );
 }
 
-function SectionHeader() {
+function SectionHeader({ onTryNow }) {
   return (
     <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 text-left">
       <div className="max-w-2xl flex flex-col gap-3">
@@ -1144,13 +1158,7 @@ function SectionHeader() {
       <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
         <span className="text-lg text-neutral-400 font-medium">No more scrolling text</span>
         <button 
-          onClick={() => {
-            const el = document.querySelector('input[placeholder*="Ask about anything"]');
-            if (el) {
-              el.scrollIntoView({ behavior: "smooth", block: "center" });
-              setTimeout(() => el.focus(), 800);
-            }
-          }}
+          onClick={onTryNow}
           className="bg-white text-stone-950 px-6 py-3 rounded-xl font-medium hover:bg-neutral-200 transition-colors cursor-pointer"
         >
           Try it now
