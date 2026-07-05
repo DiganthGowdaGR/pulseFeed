@@ -55,6 +55,7 @@ function App() {
   const [isSearching, setIsSearching] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showLiveDemo, setShowLiveDemo] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setHeroReady(true), 2100);
@@ -79,8 +80,10 @@ function App() {
   };
 
   useEffect(() => {
-    fetchFeed();
-  }, [selectedDomains]);
+    if (showLiveDemo) {
+      fetchFeed();
+    }
+  }, [selectedDomains, showLiveDemo]);
 
   // Handle live search POST request
   const handleSearch = async () => {
@@ -97,6 +100,11 @@ function App() {
         const data = await res.json();
         setSearchResults((prev) => [data, ...prev]);
         setSearchQuery("");
+        setShowLiveDemo(true);
+        setTimeout(() => {
+          const el = document.getElementById("live-dashboard");
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 100);
       } else {
         setErrorMsg("Couldn't find live data for that — try rephrasing your search.");
       }
@@ -151,11 +159,26 @@ function App() {
               </a>
             ))}
           </nav>
-          <div className="ml-auto hidden md:block anim-pop" style={{ animationDelay: "900ms" }}>
+          <div className="ml-auto hidden md:flex items-center gap-4 anim-pop" style={{ animationDelay: "900ms" }}>
+            <button
+              onClick={() => {
+                const nextState = !showLiveDemo;
+                setShowLiveDemo(nextState);
+                if (nextState) {
+                  setTimeout(() => {
+                    const el = document.getElementById("live-dashboard");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }, 100);
+                }
+              }}
+              className="bg-transparent text-white border border-white/20 rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              {showLiveDemo ? "Hide Live Demo" : "See Actual Working"}
+            </button>
             <button 
               onClick={handleGenerateFeed}
               disabled={isGenerating}
-              className="bg-white text-black rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-neutral-200 transition-colors disabled:opacity-50"
+              className="bg-white text-black rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-neutral-200 transition-colors disabled:opacity-50 cursor-pointer"
             >
               {isGenerating ? "Regenerating..." : "Join beta"}
             </button>
@@ -428,67 +451,69 @@ function App() {
       </div>
 
       {/* Dynamic Insights Feed Dashboard Section */}
-      <section className="max-w-4xl mx-auto px-6 py-20">
-        <div className="flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
-            <div>
-              <h2 className="text-3xl font-medium text-white mb-2">Live Insights Feed</h2>
-              <p className="text-neutral-400 text-sm">Grounded real-time visual insights.</p>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Domain filtering buttons */}
-              <button
-                onClick={() => toggleDomain("movies")}
-                className={`text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors ${
-                  selectedDomains.includes("movies") ? "bg-[#2b5c8f] text-white" : "bg-neutral-900 text-neutral-400"
-                }`}
-              >
-                Movies
-              </button>
-              <button
-                onClick={() => toggleDomain("weather")}
-                className={`text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors ${
-                  selectedDomains.includes("weather") ? "bg-[#2b8f5c] text-white" : "bg-neutral-900 text-neutral-400"
-                }`}
-              >
-                Weather
-              </button>
-              <button
-                onClick={handleGenerateFeed}
-                disabled={isGenerating}
-                className="bg-neutral-100 hover:bg-neutral-200 text-black text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors disabled:opacity-50"
-              >
-                {isGenerating ? "Regenerating..." : "Refresh feed"}
-              </button>
-            </div>
-          </div>
-
-          {/* Render search results */}
-          {searchResults.length > 0 && (
-            <div className="flex flex-col gap-6">
-              <h3 className="text-xl font-medium text-red-400 uppercase tracking-wider">Live Search Results</h3>
-              {searchResults.map((item, idx) => (
-                <InsightCard key={`search-${idx}`} insight={item} isLive={true} />
-              ))}
-            </div>
-          )}
-
-          {/* Render main insights feed */}
-          <div className="flex flex-col gap-6">
-            <h3 className="text-xl font-medium text-neutral-400 uppercase tracking-wider">Feed Insights</h3>
-            {insights.length === 0 ? (
-              <div className="text-center py-12 bg-neutral-900/40 rounded-2xl border border-white/5 text-neutral-500 text-sm">
-                No insights found matching filter. Click Refresh Feed to create some.
+      {showLiveDemo && (
+        <section id="live-dashboard" className="max-w-4xl mx-auto px-6 py-20 border-t border-white/10 scroll-mt-6">
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
+              <div>
+                <h2 className="text-3xl font-medium text-white mb-2">Live Insights Feed</h2>
+                <p className="text-neutral-400 text-sm">Grounded real-time visual insights.</p>
               </div>
-            ) : (
-              insights.map((item) => (
-                <InsightCard key={item.id} insight={item} isLive={false} />
-              ))
+              
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Domain filtering buttons */}
+                <button
+                  onClick={() => toggleDomain("movies")}
+                  className={`text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors cursor-pointer ${
+                    selectedDomains.includes("movies") ? "bg-[#2b5c8f] text-white" : "bg-neutral-900 text-neutral-400"
+                  }`}
+                >
+                  Movies
+                </button>
+                <button
+                  onClick={() => toggleDomain("weather")}
+                  className={`text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors cursor-pointer ${
+                    selectedDomains.includes("weather") ? "bg-[#2b8f5c] text-white" : "bg-neutral-900 text-neutral-400"
+                  }`}
+                >
+                  Weather
+                </button>
+                <button
+                  onClick={handleGenerateFeed}
+                  disabled={isGenerating}
+                  className="bg-neutral-100 hover:bg-neutral-200 text-black text-xs font-semibold px-4 py-2 rounded-full uppercase transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {isGenerating ? "Regenerating..." : "Refresh feed"}
+                </button>
+              </div>
+            </div>
+
+            {/* Render search results */}
+            {searchResults.length > 0 && (
+              <div className="flex flex-col gap-6">
+                <h3 className="text-xl font-medium text-red-400 uppercase tracking-wider">Live Search Results</h3>
+                {searchResults.map((item, idx) => (
+                  <InsightCard key={`search-${idx}`} insight={item} isLive={true} />
+                ))}
+              </div>
             )}
+
+            {/* Render main insights feed */}
+            <div className="flex flex-col gap-6">
+              <h3 className="text-xl font-medium text-neutral-400 uppercase tracking-wider">Feed Insights</h3>
+              {insights.length === 0 ? (
+                <div className="text-center py-12 bg-neutral-900/40 rounded-2xl border border-white/5 text-neutral-500 text-sm">
+                  No insights found matching filter. Click Refresh Feed to create some.
+                </div>
+              ) : (
+                insights.map((item) => (
+                  <InsightCard key={item.id} insight={item} isLive={false} />
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Features section */}
       <section className="px-[20px] pt-[80px] pb-[120px]">
