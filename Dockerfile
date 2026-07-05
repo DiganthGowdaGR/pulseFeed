@@ -20,8 +20,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend requirements and install
+COPY requirements.txt ./requirements.txt
 COPY pulsefeed/requirements.txt ./pulsefeed/requirements.txt
-RUN pip install --no-cache-dir -r pulsefeed/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt -r pulsefeed/requirements.txt
 
 # Copy backend application source
 COPY backend/ ./backend
@@ -31,8 +32,8 @@ COPY app.py ./app.py
 # Copy frontend build output from stage 1 into the backend serve path
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Expose port (default FastAPI/Uvicorn port)
-EXPOSE 8000
+# Expose Cloud Run default port
+EXPOSE 8080
 
-# Run FastAPI backend with Uvicorn
-CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run FastAPI backend with Uvicorn on the port supplied by Cloud Run
+CMD ["sh", "-c", "exec python -m uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
