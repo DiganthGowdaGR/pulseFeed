@@ -6,12 +6,11 @@ import requests
 from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
 
 # Add current folder to sys.path to allow running directly
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from common import save_insight_to_firestore
+from gemini_client import call_gemini
 
 load_dotenv()
 
@@ -22,11 +21,15 @@ class DataPoint(BaseModel):
     image_url: Optional[str] = Field(None, description="Always null for weather insights")
 
 class WeatherInsightSchema(BaseModel):
-    chart_type: Literal["comparison_bar"] = "comparison_bar"
+    domain: str = "weather"
+    query: Optional[str] = None
+    chart_type: Literal["comparison_bar", "trend_line", "text_only"] = "comparison_bar"
     caption: str = Field(description="Comparison caption citing specific numbers (temperatures, humidity, etc.) from the weather data")
     confidence: Literal["high", "medium", "low"] = Field(description="high if data is complete, low if any data was missing")
     data_points: List[DataPoint]
-    sources: List[str] = Field(default=["Weather API"], description="Sources of the data. Must be exactly ['Weather API'].")
+    sources: List[str] = ["Weather API"]
+    search_suggestions_html: Optional[str] = None
+    generated_via: Literal["structured_api", "grounded_search"] = "structured_api"
 
 def fetch_rain_probability(city: str) -> float | None:
     api_key = os.getenv("WEATHER_API_KEY")
@@ -91,35 +94,27 @@ def fetch_weather_data(cities: list[str]) -> list[dict]:
 
 def generate_comparison_insight(weather_data: list[dict]) -> dict:
     print(f"Raw weather data before sending to Gemini: {weather_data}")
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     prompt = (
         f"Compare the weather conditions across these cities: {json.dumps(weather_data)}.\n"
         "Draft a 1-2 sentence comparison caption citing specific temperatures, humidity, and rain probabilities (as percentage e.g., 70%) from the dataset.\n"
         "Format temperatures clearly as 'X.X°C' (e.g., 23.0°C) without any newlines or encoding artifacts.\n"
         "Always set the 'sources' field to exactly ['Weather API']."
     )
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=WeatherInsightSchema,
-            ),
-        )
-        print(f"Raw Gemini response: {repr(response.text)}")
-        insight_json = json.loads(response.text)
+    insight_json = call_gemini(
+        prompt=prompt,
+        use_search_grounding=False,
+        response_schema=WeatherInsightSchema
+    )
+    if "error" in insight_json:
+        raise Exception(f"Gemini call failed: {insight_json['error']}")
         
-        # Robustly clean up any remaining encoding or newline corruption in the caption
-        if "caption" in insight_json and isinstance(insight_json["caption"], str):
-            caption = insight_json["caption"]
-            caption = caption.replace("\n\u00b0", "°").replace("\nA\u00b0", "°").replace("\n°", "°").replace("Â°", "°")
-            insight_json["caption"] = caption
-            
-        return insight_json
-    except Exception as e:
-        print(f"ERROR: Failed to parse Gemini response. Raw: {response.text if 'response' in locals() else 'N/A'}")
-        raise e
+    # Robustly clean up any remaining encoding or newline corruption in the caption
+    if "caption" in insight_json and isinstance(insight_json["caption"], str):
+        caption = insight_json["caption"]
+        caption = caption.replace("\n\u00b0", "°").replace("\nA\u00b0", "°").replace("\n°", "°").replace("Â°", "°")
+        insight_json["caption"] = caption
+        
+    return insight_json
 
 if __name__ == "__main__":
     print("Fetching weather data...")
