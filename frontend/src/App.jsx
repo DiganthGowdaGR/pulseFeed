@@ -68,7 +68,7 @@ function App() {
   };
 
   const enterDashboardLive = () => {
-    handleSearch("movies");
+    setShowInsideView(true);
   };
 
   useEffect(() => {
@@ -150,7 +150,7 @@ function App() {
     }
   };
 
-  if (showInsideView && activeInsight) {
+  if (showInsideView) {
     return (
       <InsideDashboard 
         insight={activeInsight} 
@@ -1535,6 +1535,126 @@ function InsideDashboard({ insight, onClose, onSearch, isSearching }) {
     onSearch(insideSearchQuery.trim());
     setInsideSearchQuery("");
   };
+
+  if (!insight) {
+    return (
+      <div className="flex h-screen w-full bg-black text-[#f5f5f5] font-display antialiased overflow-hidden select-none">
+        
+        {/* Sidebar Navigation */}
+        <aside className="w-60 bg-gradient-to-b from-[#0A090A] to-[#121112] border-r border-white/5 flex flex-col justify-between py-6 px-4.5 z-50 shrink-0 text-left">
+          <div className="flex flex-col gap-9">
+            <div className="flex items-center gap-3 px-1.5">
+              <div className="size-8.5 rounded-xl bg-white/10 flex items-center justify-center border border-white/15">
+                <img src={logoUrl} alt="Logo" width={20} height={20} />
+              </div>
+              <span className="text-lg font-semibold tracking-tight text-white font-display">PulseFeed</span>
+            </div>
+
+            <nav className="flex flex-col gap-1.5">
+              {[
+                { label: "Feed", active: false, icon: "feed", action: onClose },
+                { label: "Filters", active: false, icon: "filter_list" },
+                { label: "Search Insights", active: true, icon: "search" },
+                { label: "All Insights", active: false, icon: "database" },
+              ].map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={item.action}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-left relative ${
+                    item.active 
+                      ? "bg-white/10 text-white border border-white/5 shadow-[0_2px_12px_rgba(255,255,255,0.03)]" 
+                      : "text-neutral-400 hover:text-white hover:bg-white/5 hover:translate-x-0.5"
+                  }`}
+                >
+                  {item.active && (
+                    <span className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-white rounded-r-md" />
+                  )}
+                  <span className="material-symbols-outlined text-[19px] opacity-80">{item.icon}</span>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <div className="px-1.5">
+            <button 
+              onClick={onClose}
+              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl py-3 text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer"
+            >
+              Back to Home
+            </button>
+          </div>
+        </aside>
+
+        {/* Search Main Workspace */}
+        <main className="flex-grow flex flex-col justify-center items-center relative h-full bg-[#070607] px-6">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/3 via-transparent to-transparent pointer-events-none z-0" />
+          
+          <div className="max-w-2xl w-full text-center relative z-10 flex flex-col items-center gap-8">
+            <div className="flex flex-col items-center gap-3">
+              <span className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs font-mono font-semibold uppercase tracking-widest text-neutral-400">
+                PulseFeed Live Workspace
+              </span>
+              <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white leading-tight">
+                Ask about anything.
+              </h2>
+              <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">
+                Enter any query below to run a live Google Search Grounding request or pull structured metrics, directly rendering comparative charts.
+              </p>
+            </div>
+
+            {/* Centered Command search bar */}
+            <div className="w-full relative flex items-center gap-3">
+              <div className="relative flex-grow">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 text-xl">search</span>
+                <input 
+                  type="text" 
+                  placeholder="Query prices, job trends, ratings, comparisons..." 
+                  value={insideSearchQuery}
+                  onChange={(e) => setInsideSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleInsideSearch()}
+                  className="w-full bg-[#111011] border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white/20 transition-all duration-200 shadow-2xl"
+                  autoFocus
+                />
+              </div>
+              <button
+                onClick={handleInsideSearch}
+                disabled={isSearching}
+                className="bg-white hover:bg-neutral-200 text-black text-sm font-semibold px-6 py-4 rounded-2xl transition-all duration-200 disabled:opacity-50 cursor-pointer shrink-0"
+              >
+                {isSearching ? "Searching..." : "Search"}
+              </button>
+            </div>
+
+            {/* Clickable Recommended test prompts */}
+            <div className="flex flex-col items-center gap-3 mt-2">
+              <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase font-mono">Suggested live queries:</span>
+              <div className="flex flex-wrap justify-center gap-2">
+                {[
+                  "React developer salaries in Bangalore",
+                  "Tokyo temperature comparison",
+                  "Oppenheimer box office collections",
+                  "best budget noise cancelling headphones under 3000 rupees"
+                ].map((prompt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setInsideSearchQuery(prompt);
+                      onSearch(prompt);
+                    }}
+                    disabled={isSearching}
+                    className="bg-white/5 hover:bg-white/8 border border-white/5 px-3 py-2 rounded-xl text-xs text-neutral-300 font-mono transition-all duration-200 hover:border-white/10 cursor-pointer disabled:opacity-50"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const { query, domain, caption, confidence, chart_type, data_points = [], sources = [] } = insight;
 
