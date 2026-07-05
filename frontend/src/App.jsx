@@ -39,10 +39,10 @@ const figmaLogoUrl = ICONS + "figma.svg";
 const whiteArrowUpRightUrl = ICONS + "WhiteArrowUpRight.svg";
 
 const navItems = [
-  { label: "Product", active: true },
-  { label: "Our story", active: false },
-  { label: "Pricing", active: false },
-  { label: "Career", active: false },
+  { label: "Feed", active: true },
+  { label: "How it works", active: false },
+  { label: "Domains", active: false },
+  { label: "About", active: false },
 ];
 
 function App() {
@@ -180,7 +180,7 @@ function App() {
               disabled={isGenerating}
               className="bg-white text-black rounded-lg py-[11px] px-[20px] text-[15px] font-medium hover:bg-neutral-200 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              {isGenerating ? "Regenerating..." : "Join beta"}
+              {isGenerating ? "Regenerating..." : "Try PulseFeed"}
             </button>
           </div>
           {/* Mobile burger */}
@@ -225,7 +225,7 @@ function App() {
               onClick={() => { setMenuOpen(false); handleGenerateFeed(); }}
               className="mt-auto bg-white text-black rounded-lg py-4 text-base font-medium"
             >
-              {isGenerating ? "Regenerating Feed..." : "Join beta"}
+              {isGenerating ? "Regenerating Feed..." : "Try PulseFeed"}
             </button>
           </div>
         )}
@@ -267,10 +267,10 @@ function App() {
               <div className="absolute inset-0 bg-black/80 z-0" />
               
               <h1 className="relative z-10 text-[34px] leading-[38px] sm:text-7xl sm:leading-[72px] font-medium text-neutral-100 max-w-5xl tracking-tight mb-[24px] sm:mb-[32px] word-stagger">
-                <StaggeredWords text="The easiest way to build your design products." baseDelay={300} step={54} />
+                <StaggeredWords text="The easiest way to see what's actually happening." baseDelay={300} step={54} />
               </h1>
               <p className="relative z-10 text-base sm:text-2xl opacity-60 text-neutral-100 w-[634px] max-w-full leading-snug mb-[24px] sm:mb-[30px] word-stagger">
-                <StaggeredWords text="PulseFeed designer — the AI-powered content and design creator for content and marketing teams." baseDelay={900} step={33} />
+                <StaggeredWords text="PulseFeed — an AI that researches real data and generates the chart, not the paragraph." baseDelay={900} step={33} />
               </p>
 
               {/* Dynamic Live Search input */}
@@ -278,7 +278,7 @@ function App() {
                 <div className="absolute inset-0 bg-neutral-900 outline outline-[1.30px] outline-white/10 rounded-xl flex items-center px-4 gap-3 anim-reveal-right" style={{ animationDelay: "1620ms", clipPath: "inset(0 100% 0 0)" }}>
                   <div className="w-5 shrink-0" />
                   <TypingPlaceholderInput 
-                    placeholder="Write your prompt/" 
+                    placeholder="Ask about anything — job trends, prices, comparisons/" 
                     startDelay={2040} 
                     speed={70} 
                     value={searchQuery}
@@ -288,9 +288,9 @@ function App() {
                   <button 
                     onClick={handleSearch}
                     disabled={isSearching}
-                    className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg h-8 px-4 transition-colors disabled:opacity-50"
+                    className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg h-8 px-4 transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    {isSearching ? "Searching..." : "Generate"}
+                    {isSearching ? "Searching..." : "Search"}
                   </button>
                 </div>
                 <img src={searchUrl} alt="" width={20} height={20} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 anim-pop" style={{ animationDelay: "1500ms" }} />
@@ -315,30 +315,40 @@ function App() {
                     animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.36, delay: 0.06, ease: "easeOut" }}
                   >
-                    <span className="text-sm font-medium text-neutral-100">Layers</span>
-                    <span className="text-sm font-medium text-neutral-100 opacity-30">Assets</span>
+                    <span className="text-sm font-medium text-neutral-100">Feed</span>
+                    <span className="text-sm font-medium text-neutral-100 opacity-30">Filters</span>
                   </motion.div>
                   <div className="flex flex-col gap-4 p-4 w-[calc(100%+1rem)] -ml-4 pl-8 border-t border-white/10">
                     {[
-                      <img key="d1" src={dash01.url} alt="Headlines" className="h-[34px] w-auto object-contain object-left ml-2" />,
-                      <img key="d2" src={dash02.url} alt="Images and fill" className="h-[34px] w-auto object-contain object-left ml-2" />,
-                      <div key="tools" className="flex items-center gap-3 h-9 px-2 text-neutral-300 text-sm">
+                      <div key="movies" className="flex items-center gap-3 h-9 px-2 text-neutral-300 text-sm">
                         <span className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m14.7 6.3 3 3"/><path d="M3 21v-3l11-11 3 3L6 21z"/></svg>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
                         </span>
-                        Tools
+                        Movies
                       </div>,
-                      <div key="cards" className="flex items-center gap-3 h-[46px] px-1 rounded-lg bg-white/[0.08] outline outline-1 outline-white/5">
+                      <div key="weather" className="flex items-center gap-3 h-9 px-2 text-neutral-300 text-sm">
+                        <span className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                        </span>
+                        Weather
+                      </div>,
+                      <div key="search" className="flex items-center gap-3 h-9 px-2 text-neutral-300 text-sm">
+                        <span className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </span>
+                        Search
+                      </div>,
+                      <div key="all" className="flex items-center gap-3 h-[46px] px-1 rounded-lg bg-white/[0.08] outline outline-1 outline-white/5">
                         <span className="w-9 h-9 ml-1 rounded-lg bg-blue-500 flex items-center justify-center">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
                         </span>
-                        <span className="text-sm text-neutral-100">Cards</span>
+                        <span className="text-sm text-neutral-100">All Insights</span>
                       </div>,
-                      <div key="add" className="flex items-center gap-3 h-9 px-2 text-neutral-300 text-sm">
+                      <div key="new-domain" className="flex items-center gap-3 h-9 px-2 text-neutral-300 text-sm">
                         <span className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                         </span>
-                        Add more
+                        New Domain
                       </div>,
                     ].map((node, i) => (
                       <motion.div
@@ -364,19 +374,19 @@ function App() {
                   >
                     <div className="flex justify-between relative z-10">
                       <div className="flex flex-col">
-                        <WordsReveal as="span" className="text-xs opacity-40 -ml-[20px] block" text="Design token style" delay={0.66} step={0.048} duration={0.3} active={heroReady} />
-                        <WordsReveal as="span" className="text-2xl font-medium mt-1 block" text="17 Updated" delay={0.75} step={0.048} duration={0.3} active={heroReady} />
+                        <WordsReveal as="span" className="text-xs opacity-40 -ml-[20px] block" text="Live Insight" delay={0.66} step={0.048} duration={0.3} active={heroReady} />
+                        <WordsReveal as="span" className="text-2xl font-medium mt-1 block" text="3 Generated" delay={0.75} step={0.048} duration={0.3} active={heroReady} />
                       </div>
                       <div className="flex flex-col items-end">
-                        <WordsReveal as="span" className="text-xs opacity-40 block" text="Status" delay={0.66} step={0.048} duration={0.3} active={heroReady} />
+                        <WordsReveal as="span" className="text-xs opacity-40 block" text="Confidence" delay={0.66} step={0.048} duration={0.3} active={heroReady} />
                         <span className="text-2xl font-medium mt-1">
-                          <CountUpInView end={93} duration={1200} delay={780} active={heroReady} />%
+                          <CountUpInView end={94} duration={1200} delay={780} active={heroReady} />%
                         </span>
                       </div>
                     </div>
                     <div className="flex justify-between w-full mt-3 relative z-10">
-                      <WordsReveal as="span" className="text-xs text-stone-950" text="Pr" delay={0.9} step={0.048} duration={0.3} active={heroReady} />
-                      <WordsReveal as="span" className="text-xs opacity-40" text="Sec" delay={0.9} step={0.048} duration={0.3} active={heroReady} />
+                      <WordsReveal as="span" className="text-xs text-stone-950" text="Movies" delay={0.9} step={0.048} duration={0.3} active={heroReady} />
+                      <WordsReveal as="span" className="text-xs opacity-40" text="Weather" delay={0.9} step={0.048} duration={0.3} active={heroReady} />
                     </div>
                     <motion.div
                       className="absolute inset-0 z-0 pointer-events-none"
@@ -398,7 +408,7 @@ function App() {
                     <img src={dashCard3Pink.url} alt="" className="absolute inset-0 w-full h-full object-cover z-0" />
                     <div className="relative z-10 flex flex-col items-center">
                       <span className="text-3xl font-medium text-neutral-900">
-                        <CountUpInView end={8000} duration={1200} delay={360} active={heroReady} />
+                        <CountUpInView end={1240} duration={1200} delay={360} active={heroReady} />
                       </span>
                       <motion.span
                         className="text-sm text-neutral-900/60 mt-1"
@@ -406,7 +416,7 @@ function App() {
                         animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                         transition={{ duration: 0.3, delay: 0.42, ease: "easeOut" }}
                       >
-                        Components
+                        Data points analyzed
                       </motion.span>
                     </div>
                   </motion.div>
@@ -524,7 +534,7 @@ function App() {
       {/* Stats section */}
       <StatsSection />
 
-      {/* Mad for designer section */}
+      {/* Signal Not Noise section */}
       <section className="bg-black">
         <div className="max-w-7xl mx-auto px-5 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left column */}
@@ -532,14 +542,14 @@ function App() {
             <WordsReveal
               as="h2"
               className="text-5xl lg:text-6xl leading-tight text-white font-medium"
-              text="Made for designers by developers"
+              text="Built for people who want signal, not noise"
               step={0.08}
               duration={0.6}
             />
             <WordsReveal
               as="p"
               className="text-2xl opacity-60 text-neutral-100 max-w-[500px]"
-              text="PulseFeed provides all you need to search, extract and visualize live grounded insights in milliseconds."
+              text="PulseFeed combines structured APIs and AI search grounding — using the right data source for each domain, not one method forced everywhere."
               step={0.05}
               delay={0.3}
               duration={0.5}
@@ -551,11 +561,23 @@ function App() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}
             >
-              <button className="bg-white text-black px-7 py-4 rounded-xl font-medium hover:bg-neutral-200 transition-colors">
+              <button 
+                onClick={() => {
+                  const el = document.getElementById("how-it-works-announcements");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="bg-white text-black px-7 py-4 rounded-xl font-medium hover:bg-neutral-200 transition-colors cursor-pointer"
+              >
                 How it works
               </button>
-              <button className="bg-white/10 text-white px-7 py-4 rounded-xl font-medium hover:bg-white/20 transition-colors">
-                View code
+              <button 
+                onClick={() => {
+                  const el = document.getElementById("how-it-works-announcements");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="bg-white/10 text-white px-7 py-4 rounded-xl font-medium hover:bg-white/20 transition-colors cursor-pointer"
+              >
+                View architecture
               </button>
             </motion.div>
           </div>
@@ -611,8 +633,8 @@ function App() {
                 <div className="flex justify-between items-start gap-4">
                   <WordsReveal
                     as="h3"
-                    className="text-5xl text-white max-w-[400px] leading-tight"
-                    text="Code and design together"
+                    className="text-5xl text-white max-w-[400px] leading-tight font-medium"
+                    text="Grounded, not guessed"
                     step={0.08}
                     delay={0.5}
                     duration={0.6}
@@ -631,7 +653,7 @@ function App() {
                   className="mt-12 text-xl opacity-60 text-neutral-100 leading-relaxed whitespace-pre-wrap font-mono"
                   delay={1.2}
                   speed={18}
-                  text={`color: var(--Black-on-White, #1A1A1A);\nfont-variant-numeric: lining-nums proportional-nums;\nfont-family: Manrope;\nfont-size: 12px;\nfont-style: normal;\nfont-weight: 500;\nline-height: normal;`}
+                  text={`{\n  "domain": "weather",\n  "confidence": "high",\n  "sources": ["Weather API"],\n  "chart_type": "comparison_bar"\n}`}
                 />
               </div>
             </div>
@@ -645,68 +667,82 @@ function App() {
         <div className="max-w-7xl mx-auto px-5 flex flex-col gap-3 lg:gap-5">
           <div className="flex flex-col lg:flex-row w-full gap-3 lg:gap-4">
             <PillReveal delay={0.3}>
-              <Pill label="Developer and Designer" icon={usersRoundUrl} bg="#D0C9B9" text="text-neutral-900" iconBg="bg-black/5" invertIcon />
+              <Pill label="Structured APIs" icon={usersRoundUrl} bg="#D0C9B9" text="text-neutral-900" iconBg="bg-black/5" invertIcon />
             </PillReveal>
             <PillReveal delay={0.4}>
-              <Pill label="Export ({ image})" icon={imagePlusUrl} bg="#131113" text="text-white" iconBg="bg-white/10" />
+              <Pill label="Live Search Grounding" icon={imagePlusUrl} bg="#131113" text="text-white" iconBg="bg-white/10" />
             </PillReveal>
             <PillReveal delay={0.5}>
-              <Pill label="Copy code" icon={copyUrl} bg="#F7C8FF" text="text-neutral-900" iconBg="bg-black/5" invertIcon />
+              <Pill label="Cited Sources" icon={copyUrl} bg="#F7C8FF" text="text-neutral-900" iconBg="bg-black/5" invertIcon />
             </PillReveal>
           </div>
           <div className="flex flex-col lg:flex-row w-full gap-3 lg:gap-4">
             <PillReveal delay={0.4}>
-              <Pill label="Engineers" icon={usersRoundUrl} bg="#131113" text="text-white" iconBg="bg-white/10" />
+              <Pill label="Gemini + Vertex AI" icon={usersRoundUrl} bg="#131113" text="text-white" iconBg="bg-white/10" />
             </PillReveal>
             <PillReveal delay={0.5}>
-              <Pill label="View source code" icon={codeXmlUrl} bg="#131113" text="text-white" iconBg="bg-white/10" />
+              <Pill label="Open architecture" icon={codeXmlUrl} bg="#131113" text="text-white" iconBg="bg-white/10" />
             </PillReveal>
             <PillReveal delay={0.6}>
-              <Pill label="Punch data" icon={webhookUrl} bg="#81FFBD" text="text-neutral-900" iconBg="bg-black/5" invertIcon />
+              <Pill label="Real-time data" icon={webhookUrl} bg="#81FFBD" text="text-neutral-900" iconBg="bg-black/5" invertIcon />
             </PillReveal>
           </div>
         </div>
       </section>
 
-      {/* Plans and Pricing section */}
+      {/* Domains section */}
       <section className="bg-black p-5">
         <div className="rounded-3xl px-8 py-12 sm:px-20 sm:py-20 max-w-7xl mx-auto text-left" style={{ backgroundColor: "#D8D0BC" }}>
           <WordsReveal
             as="h2"
             className="text-5xl lg:text-6xl text-stone-950 text-center mb-20 block font-medium"
-            text="Plans and Pricing"
+            text="Supported Domains"
             step={0.1}
             duration={0.6}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
             <PricingPlan
-              price="$20"
-              description="Upgrade to unlock additional features for a more comprehensive and freedom designs"
+              price="Movies & Weather"
+              description="Structured, API-verified data — exact ratings, real-time conditions, always cited."
               features={[
-                { label: "Up to 5 Design System LITE" },
-                { label: "Standard components" },
-                { label: "Animated titles, captions, B-roll" },
-                { label: "AI Co-Producer™", dim: true },
+                { label: "Real-time weather comparison" },
+                { label: "Movie rating comparisons" },
+                { label: "Image-backed insights" },
+                { label: "High confidence scoring" },
               ]}
-              cta="Get Started"
+              cta="View live feed"
               ctaClass="bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
+              onClick={() => {
+                setShowLiveDemo(true);
+                setTimeout(() => {
+                  const el = document.getElementById("live-dashboard");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }, 100);
+              }}
             />
             <PricingPlan
-              price="$59"
-              description="Elevate your design game with advanced tools and exclusive features."
+              price="Ask Anything"
+              description="Live Google Search grounding lets you ask about any topic — job trends, prices, comparisons — and get a cited, structured answer."
               features={[
-                { label: "Unlimited Design System LITE" },
-                { label: "Pro components" },
-                { label: "Animated titles, captions, B-roll" },
-                { label: "AI Co-Producer™" },
+                { label: "Live web-grounded search" },
+                { label: "Real citation tracking" },
+                { label: "Structured comparisons" },
+                { label: "Honest confidence labeling" },
               ]}
-              cta="Send Message"
+              cta="Try a live search"
               ctaClass="bg-transparent text-stone-950 border border-stone-950/50 hover:bg-stone-950/10 transition-colors"
+              onClick={() => {
+                const el = document.querySelector('input[type="text"]');
+                if (el) {
+                  el.focus();
+                  el.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+              }}
             />
           </div>
 
-          {/* Partners footer */}
+          {/* Powered by footer */}
           <motion.div
             className="mt-24 border-t border-black/10 pt-12 flex flex-wrap justify-center items-center gap-10"
             initial="hidden"
@@ -715,14 +751,14 @@ function App() {
             transition={{ staggerChildren: 0.15, delayChildren: 0.1 }}
           >
             {[
-              <span key="t" className="text-3xl font-medium text-stone-950">Partners</span>,
+              <span key="t" className="text-3xl font-medium text-stone-950">Powered by</span>,
               <div key="bar" className="w-64 h-3 bg-stone-400/40 rounded-full relative overflow-hidden">
                 <div className="w-16 h-full bg-stone-950 rounded-full" />
               </div>,
-              <div key="logos" className="px-6 py-2 bg-stone-200/60 rounded-xl flex gap-10 items-center">
-                <img src={figmaLogoUrl} alt="Figma" className="h-8 w-auto" />
-                <img src={logo2Url} alt="Partner" className="h-8 w-auto" />
-                <img src={logo3Url} alt="Partner" className="h-8 w-auto" />
+              <div key="logos" className="px-6 py-2 bg-stone-900 rounded-xl flex gap-4 items-center">
+                <span className="text-white text-xs font-semibold bg-white/10 px-3.5 py-1.5 rounded-lg uppercase tracking-wider">Gemini</span>
+                <span className="text-white text-xs font-semibold bg-white/10 px-3.5 py-1.5 rounded-lg uppercase tracking-wider">Vertex AI</span>
+                <span className="text-white text-xs font-semibold bg-white/10 px-3.5 py-1.5 rounded-lg uppercase tracking-wider">Firestore</span>
               </div>,
             ].map((child, i) => (
               <motion.div
@@ -737,37 +773,36 @@ function App() {
         </div>
       </section>
 
-      {/* Updates and news section */}
-      <section className="bg-black text-left">
+      {/* How PulseFeed actually works section */}
+      <section id="how-it-works-announcements" className="bg-black text-left">
         <div className="max-w-7xl mx-auto px-5 py-24 flex flex-col gap-16 relative">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
             <div className="flex flex-col gap-8 max-w-2xl">
               <WordsReveal
                 as="h2"
                 className="text-5xl lg:text-6xl text-neutral-100 leading-tight block font-medium"
-                text="PulseFeed updated and news"
+                text="How PulseFeed actually works"
                 step={0.08}
                 duration={0.6}
               />
               <WordsReveal
                 as="p"
                 className="text-xl lg:text-2xl opacity-60 text-neutral-100 leading-8 block"
-                text="With its latest update, PulseFeed pushes the boundaries of visual analysis, offering live searching and grounded comparative feeds."
+                text="From raw data to visual insight in three steps — no manual research, no stale summaries."
                 step={0.04}
                 delay={0.3}
                 duration={0.5}
               />
             </div>
-            <motion.a
-              href="#"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
-              className="inline-flex shrink-0 bg-white text-black px-7 py-4 rounded-xl font-medium text-lg hover:bg-neutral-200 transition-colors"
+            <button
+              onClick={() => {
+                const el = document.getElementById("how-it-works-announcements");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="inline-flex shrink-0 bg-white text-black px-7 py-4 rounded-xl font-medium text-lg hover:bg-neutral-200 transition-colors cursor-pointer"
             >
-              I want to learn more
-            </motion.a>
+              See the architecture
+            </button>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-16 relative">
@@ -785,13 +820,13 @@ function App() {
 
             <div className="w-full lg:w-[65%] flex flex-col relative pb-20">
               <div className="flex justify-between items-center mb-6">
-                <WordsReveal as="h3" className="text-4xl text-neutral-100 block font-medium" text="Announcement" step={0.1} duration={0.6} />
+                <WordsReveal as="h3" className="text-4xl text-neutral-100 block font-medium" text="The pipeline" step={0.1} duration={0.6} />
                 <img src={whiteArrowUpRightUrl} alt="" width={28} height={28} />
               </div>
               <WordsReveal
                 as="p"
                 className="text-xl lg:text-2xl text-neutral-100 opacity-60 leading-8 mb-6 block"
-                text="Revolutionize your design process with our latest AI design tool feature announcement! Introducing a groundbreaking addition to our toolkit that will transform the way you create."
+                text="PulseFeed fetches from structured APIs (OMDb, OpenWeatherMap) where clean data exists, and uses Gemini with Google Search grounding for open-ended topics."
                 step={0.03}
                 delay={0.2}
                 duration={0.5}
@@ -799,7 +834,7 @@ function App() {
               <WordsReveal
                 as="p"
                 className="text-xl lg:text-2xl text-neutral-100 opacity-60 leading-8 mb-6 block"
-                text="Packed with innovative features and enhancements, this release marks a significant milestone in revolutionizing the way you design and create."
+                text="Every insight is generated as structured JSON — a chart type, a caption citing real numbers, a confidence score, and real sources — never invented."
                 step={0.03}
                 delay={0.4}
                 duration={0.5}
@@ -807,7 +842,7 @@ function App() {
               <WordsReveal
                 as="p"
                 className="text-xl lg:text-2xl text-neutral-100 opacity-40 leading-8 block"
-                text="Experience enhanced user experience, advanced AI capabilities, collaboration tools, an expanded asset library, performance improvements, customization options, integration with popular tools, enhanced security, and comprehensive tutorials and support – all in one update!"
+                text="This means every card you see traces back to something real: an API response or a live search result, not the AI's memory."
                 step={0.025}
                 delay={0.6}
                 duration={0.5}
@@ -859,7 +894,7 @@ function App() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ staggerChildren: 0.12, delayChildren: 0.9 }}
             >
-              {["About", "Privacy policy", "Terms and conditions", "Contact us"].map((l) => (
+              {["About", "How it works", "Architecture", "Contact us"].map((l) => (
                 <motion.a
                   key={l}
                   className="text-base font-medium text-neutral-100 cursor-pointer hover:opacity-70 transition-opacity"
@@ -877,7 +912,7 @@ function App() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ staggerChildren: 0.12, delayChildren: 1.5 }}
             >
-              {["Twitter/X", "LinkedIn", "Instagram"].map((l) => (
+              {["Twitter/X", "LinkedIn", "GitHub"].map((l) => (
                 <motion.a
                   key={l}
                   className="text-base font-medium text-neutral-100 cursor-pointer hover:opacity-70 transition-opacity"
@@ -902,14 +937,14 @@ function App() {
               </motion.p>
             </div>
             <div className="md:col-span-8">
-              <p className="text-sm font-normal text-neutral-100 opacity-70 leading-5 max-w-[866px]">
+              <div className="text-sm font-normal text-neutral-100 opacity-70 leading-5 max-w-[866px]">
                 <WordsReveal
-                  text="Our AI insight generator is committed to protecting your privacy and data security. We collect only necessary information to enhance your user experience and provide personalized services. Your data is encrypted and securely stored, accessible only to authorized personnel."
+                  text="PulseFeed only processes data from the sources you see cited on each card — structured APIs like OMDb and OpenWeatherMap, or live Google Search grounding results. No personal data is required to view the feed. For details on how generated insights are sourced and cited, see our architecture page."
                   step={0.02}
                   delay={2.3}
                   duration={0.4}
                 />
-              </p>
+              </div>
             </div>
           </div>
         </div>
@@ -1047,47 +1082,102 @@ function PillReveal({ children, delay = 0 }) {
 
 function SectionHeader() {
   return (
-    <div className="max-w-4xl mx-auto text-center mb-16">
-      <span className="text-sm font-semibold tracking-wider text-neutral-400 uppercase">Features</span>
-      <h2 className="text-4xl md:text-5xl font-medium mt-3 mb-6 text-white leading-tight">
-        Insights and search powered by live grounded intelligence
-      </h2>
-      <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
-        Compare multiple datasets dynamically, query any custom topic, and retrieve verified search citations immediately.
-      </p>
+    <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 text-left">
+      <div className="max-w-2xl flex flex-col gap-3">
+        <span className="text-sm font-semibold tracking-wider text-neutral-400 uppercase">Features</span>
+        <h2 className="text-4xl md:text-5xl font-medium text-white leading-tight">
+          Real data becomes real insight — automatically, visually, honestly.
+        </h2>
+      </div>
+      <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
+        <span className="text-lg text-neutral-400 font-medium">No more scrolling text</span>
+        <button 
+          onClick={() => {
+            const el = document.getElementById("live-dashboard");
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth" });
+            } else {
+              const trigger = document.querySelector('[class*="cursor-pointer"]');
+              if (trigger) trigger.click();
+            }
+          }}
+          className="bg-white text-stone-950 px-6 py-3 rounded-xl font-medium hover:bg-neutral-200 transition-colors cursor-pointer"
+        >
+          Try it now
+        </button>
+      </div>
     </div>
   );
 }
 
 function FeatureCards() {
+  const ref = useRef(null);
+  const inView = useInViewFM(ref, { once: true, margin: "-50px" });
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
-      <div className="bg-neutral-900/60 border border-white/10 rounded-2xl p-8 flex flex-col gap-4">
-        <span className="text-blue-500 font-semibold text-sm">01</span>
-        <h3 className="text-xl font-medium text-white">Interactive Live Search</h3>
-        <p className="text-neutral-400 text-sm leading-relaxed">
-          Type any custom prompt or trend topic to fetch immediate, grounded comparisons and facts from Gemini and Google Search.
-        </p>
+    <div ref={ref} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
+      {/* Card 1 */}
+      <div className="bg-neutral-900/60 border border-white/10 rounded-3xl p-8 flex flex-col justify-between h-[360px]">
+        <div className="flex flex-col gap-3">
+          <h3 className="text-2xl font-medium text-white">An AI that researches before it writes</h3>
+          <p className="text-neutral-400 text-sm leading-relaxed mt-2">
+            PulseFeed pulls from live APIs and real-time search — every insight is grounded, cited, and traceable back to its source.
+          </p>
+        </div>
+        <div className="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col gap-2 mt-4">
+          <div className="flex items-center gap-2 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-400">
+            <span className="size-2 rounded-full bg-blue-400"></span>
+            Movies
+          </div>
+          <div className="flex items-center gap-2 text-xs font-medium px-2.5 py-1.5 rounded-lg text-neutral-400">
+            <span className="size-2 rounded-full bg-neutral-600"></span>
+            Weather
+          </div>
+          <div className="flex items-center gap-2 text-xs font-medium px-2.5 py-1.5 rounded-lg text-neutral-400">
+            <span className="size-2 rounded-full bg-neutral-600"></span>
+            Live Search
+          </div>
+        </div>
       </div>
-      <div className="bg-neutral-900/60 border border-white/10 rounded-2xl p-8 flex flex-col gap-4">
-        <span className="text-indigo-500 font-semibold text-sm">02</span>
-        <h3 className="text-xl font-medium text-white">Dynamic Charts Rendering</h3>
-        <p className="text-neutral-400 text-sm leading-relaxed">
-          Compare numeric metrics cleanly in custom CSS-rendered bar charts. Text-only domains are structured dynamically.
-        </p>
+
+      {/* Card 2 */}
+      <div className="bg-neutral-900/60 border border-white/10 rounded-3xl p-8 flex flex-col justify-between h-[360px]">
+        <div className="flex flex-col gap-3">
+          <h3 className="text-2xl font-medium text-white">Charts, not paragraphs</h3>
+          <p className="text-neutral-400 text-sm leading-relaxed mt-2">
+            Instead of summarizing articles into more text, PulseFeed generates the actual visual — a comparison, a trend, a chart that didn't exist until the data was analyzed.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 mt-4">
+          {["Bar chart", "Trend line", "Comparison"].map((tag, idx) => (
+            <span key={idx} className="bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-xs text-neutral-300 font-medium">
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
-      <div className="bg-neutral-900/60 border border-white/10 rounded-2xl p-8 flex flex-col gap-4">
-        <span className="text-purple-500 font-semibold text-sm">03</span>
-        <h3 className="text-xl font-medium text-white">Vertex AI Fallback Layer</h3>
-        <p className="text-neutral-400 text-sm leading-relaxed">
-          Automatic model queries backup using Google Cloud Vertex AI infrastructure when API Studio credentials hit limits.
-        </p>
+
+      {/* Card 3 */}
+      <div className="bg-neutral-900/60 border border-white/10 rounded-3xl p-8 flex flex-col justify-between h-[360px]">
+        <div className="flex flex-col gap-2">
+          <span className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Search live</span>
+          <h3 className="text-2xl font-medium text-white">Ask about anything, live</h3>
+          <p className="text-neutral-400 text-sm leading-relaxed mt-2">
+            Instant grounded reports citing exact prices, numbers, and specifications directly from current search indexing.
+          </p>
+        </div>
+        <div className="flex flex-col items-start mt-4 font-semibold">
+          <span className="text-5xl font-mono text-white font-medium">
+            <CountUpInView end={1200} duration={1500} active={inView} />+
+          </span>
+          <span className="text-xs text-neutral-400 mt-1 uppercase tracking-wider">live searches run</span>
+        </div>
       </div>
     </div>
   );
 }
 
-function PricingPlan({ price, description, features, cta, ctaClass }) {
+function PricingPlan({ price, description, features, cta, ctaClass, onClick }) {
   const item = {
     hidden: { opacity: 0, y: 24 },
     visible: { opacity: 1, y: 0 },
@@ -1102,7 +1192,6 @@ function PricingPlan({ price, description, features, cta, ctaClass }) {
     >
       <motion.div className="flex items-baseline gap-3" variants={item} transition={{ duration: 0.55, ease: "easeOut" }}>
         <span className="text-4xl font-medium text-stone-950">{price}</span>
-        <span className="text-2xl text-stone-950/50">/ Per Month</span>
       </motion.div>
       <motion.p className="text-2xl text-stone-950 mt-6" variants={item} transition={{ duration: 0.55, ease: "easeOut" }}>
         {description}
@@ -1121,7 +1210,8 @@ function PricingPlan({ price, description, features, cta, ctaClass }) {
         ))}
       </div>
       <motion.button
-        className={`w-full py-4 rounded-xl font-medium mt-10 ${ctaClass}`}
+        onClick={onClick}
+        className={`w-full py-4 rounded-xl font-medium mt-10 cursor-pointer ${ctaClass}`}
         variants={item}
         transition={{ duration: 0.55, ease: "easeOut" }}
       >
