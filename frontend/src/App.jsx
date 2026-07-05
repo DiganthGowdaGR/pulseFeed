@@ -285,28 +285,10 @@ function App() {
               <div className="flex-1 flex items-center">
                 <img src={macDotUrl} alt="" width={60} height={12} />
               </div>
-              <div className="flex items-center gap-2 relative z-10 sm:gap-3 anim-rise" style={{ animationDelay: "1140ms" }}>
-                <div className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[9px] text-neutral-300 font-mono tracking-wider">
-                  <span className="size-1 rounded-full bg-yellow-500 animate-pulse"></span>
-                  API.OMDB
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[9px] text-neutral-300 font-mono tracking-wider">
-                  <span className="size-1 rounded-full bg-blue-400 animate-pulse"></span>
-                  API.WEATHER
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1 flex items-center gap-1.5 text-[9px] text-neutral-300 font-mono tracking-wider">
-                  <span className="size-1 rounded-full bg-red-400 animate-pulse"></span>
-                  GOOGLE.SEARCH
-                </div>
-              </div>
-              <div className="flex-1 flex items-center justify-end gap-4">
+              <div className="flex-1 flex items-center justify-end">
                 <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-[10px] px-4 py-1.5 transition-colors anim-pop" style={{ animationDelay: "1440ms" }}>
                   Share
                 </button>
-                <div className="flex items-center space-x-[-10px]">
-                  <img src={srUrl} alt="Sr" width={36} height={36} className="relative z-0 outline outline-2 outline-stone-950 rounded-full anim-pop" style={{ animationDelay: "1500ms" }} />
-                  <img src={nmUrl} alt="Nm" width={36} height={36} className="relative z-10 outline outline-2 outline-stone-950 rounded-full anim-pop" style={{ animationDelay: "1560ms" }} />
-                </div>
               </div>
             </div>
 
@@ -862,7 +844,7 @@ function App() {
             </div>
             <button
               onClick={() => {
-                const el = document.getElementById("how-it-works-announcements");
+                const el = document.getElementById("architecture");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }}
               className="inline-flex shrink-0 bg-white text-black px-7 py-4 rounded-xl font-medium text-lg hover:bg-neutral-200 transition-colors cursor-pointer"
@@ -879,8 +861,19 @@ function App() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.7, ease: "easeOut" }}
             >
-              <div className="rounded-3xl overflow-hidden bg-neutral-900">
-                <img src={cardAsset.url} alt="" className="w-full h-auto block" />
+              {/* Placeholder — replace src with your image when ready */}
+              <div className="rounded-3xl overflow-hidden bg-neutral-900 border border-white/5 flex flex-col items-center justify-center min-h-[340px] gap-4 relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-neutral-800/40 via-neutral-900 to-black rounded-3xl" />
+                <div className="relative z-10 flex flex-col items-center gap-3 px-8 text-center">
+                  <div className="size-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-400">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                  </div>
+                  <p className="text-xs font-mono text-neutral-500 tracking-widest uppercase">Image coming soon</p>
+                </div>
               </div>
             </motion.div>
 
@@ -892,7 +885,7 @@ function App() {
               <WordsReveal
                 as="p"
                 className="text-xl lg:text-2xl text-neutral-100 opacity-60 leading-8 mb-6 block"
-                text="PulseFeed fetches from structured APIs (OMDb, OpenWeatherMap) where clean data exists, and uses Gemini with Google Search grounding for open-ended topics."
+                text="PulseFeed cross-references multiple live data sources for every query — pulling structured records where clean data exists, and using AI search grounding for open-ended topics."
                 step={0.03}
                 delay={0.2}
                 duration={0.5}
@@ -919,7 +912,157 @@ function App() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Architecture Flow Section */}
+      <section id="architecture" className="bg-black text-left">
+        <div className="max-w-7xl mx-auto px-5 py-24 flex flex-col gap-16">
+          {/* Header */}
+          <div className="flex flex-col gap-4 max-w-3xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 w-fit"
+            >
+              <span className="size-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-xs font-mono text-neutral-400 tracking-widest uppercase">System Architecture</span>
+            </motion.div>
+            <WordsReveal
+              as="h2"
+              className="text-5xl lg:text-6xl text-neutral-100 leading-tight font-medium block"
+              text="How every insight is built"
+              step={0.08}
+              duration={0.6}
+            />
+            <WordsReveal
+              as="p"
+              className="text-xl text-neutral-400 leading-8 block"
+              text="A five-stage pipeline turns your query into a verified, multi-source visual card — in seconds."
+              step={0.03}
+              delay={0.2}
+              duration={0.5}
+            />
+          </div>
+
+          {/* Pipeline steps */}
+          <div className="flex flex-col gap-0">
+            {[
+              {
+                step: "01",
+                title: "Query Input",
+                desc: "You type a topic — a movie, a weather comparison, a market stat. PulseFeed parses your intent and classifies the domain.",
+                color: "from-violet-500/20 to-transparent",
+                dot: "bg-violet-400",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                )
+              },
+              {
+                step: "02",
+                title: "Source Selection",
+                desc: "The AI engine picks the right data layer — structured data feeds for clean numeric domains, or live search grounding for open-ended topics.",
+                color: "from-blue-500/20 to-transparent",
+                dot: "bg-blue-400",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                )
+              },
+              {
+                step: "03",
+                title: "Data Grounding",
+                desc: "Real facts are fetched and cross-referenced across multiple sources. No hallucinations — if a number can't be verified, confidence is marked low.",
+                color: "from-emerald-500/20 to-transparent",
+                dot: "bg-emerald-400",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                )
+              },
+              {
+                step: "04",
+                title: "Structured Output",
+                desc: "Results are serialised into a strict JSON schema — chart type, data points, caption, confidence score, and cited sources. Nothing reaches the UI unverified.",
+                color: "from-amber-500/20 to-transparent",
+                dot: "bg-amber-400",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                  </svg>
+                )
+              },
+              {
+                step: "05",
+                title: "Visual Render",
+                desc: "The structured data is mapped into the bento card layout — a comparison chart, a news reader, source tags, and confidence indicators — rendered live in your browser.",
+                color: "from-rose-500/20 to-transparent",
+                dot: "bg-rose-400",
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="9" y1="21" x2="9" y2="9"/>
+                  </svg>
+                )
+              }
+            ].map((item, i) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.55, delay: i * 0.1, ease: "easeOut" }}
+                className="flex gap-6 group"
+              >
+                {/* Left: step number + connector line */}
+                <div className="flex flex-col items-center pt-1">
+                  <div className={`size-2 rounded-full ${item.dot} mt-1.5 shrink-0`} />
+                  {i < 4 && <div className="w-px flex-1 bg-white/8 my-2" />}
+                </div>
+                {/* Right: content card */}
+                <div className={`flex-1 bg-gradient-to-br ${item.color} border border-white/5 rounded-2xl p-6 mb-4 hover:border-white/10 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="size-8 rounded-lg bg-white/5 border border-white/8 flex items-center justify-center text-neutral-400">
+                      {item.icon}
+                    </div>
+                    <span className="text-[11px] font-mono text-neutral-500 tracking-widest uppercase">Step {item.step}</span>
+                    <span className="text-base font-semibold text-neutral-100">{item.title}</span>
+                  </div>
+                  <p className="text-base text-neutral-400 leading-7 pl-11">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex items-center gap-4"
+          >
+            <button
+              onClick={() => {
+                const el = document.getElementById("hero");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-xl font-medium hover:bg-neutral-100 transition-colors cursor-pointer"
+            >
+              Try it now
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+            <span className="text-sm text-neutral-500">No account required — runs live in the browser.</span>
+          </motion.div>
+        </div>
+      </section>
+
       <motion.footer
         id="about-pipeline"
         className="bg-black border-t-2 border-neutral-100/20 text-left"
@@ -1006,7 +1149,7 @@ function App() {
             <div className="md:col-span-8">
               <div className="text-sm font-normal text-neutral-100 opacity-70 leading-5 max-w-[866px]">
                 <WordsReveal
-                  text="PulseFeed only processes data from the sources you see cited on each card — structured APIs like OMDb and OpenWeatherMap, or live Google Search grounding results. No personal data is required to view the feed. For details on how generated insights are sourced and cited, see our architecture page."
+                  text="PulseFeed only processes data from the sources cited on each insight card — verified live data feeds and AI-grounded search results. No personal data is required to view the feed. For details on how generated insights are sourced and verified, see our how-it-works page."
                   step={0.02}
                   delay={2.3}
                   duration={0.4}
@@ -2111,3 +2254,4 @@ function InsideDashboard({ insight, onClose, onSearch, onSelectInsight, isSearch
 }
 
 export default App;
+
