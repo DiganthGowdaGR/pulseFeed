@@ -97,7 +97,7 @@ Builds both React and FastAPI apps and serves them from a single high-performanc
 docker build -t pulsefeed .
 
 # Run the container (ensure env variables are passed)
-docker run -p 8000:8000 --env-file pulsefeed/.env pulsefeed
+docker run -p 8000:8080 --env-file pulsefeed/.env pulsefeed
 ```
 Your application will be live on `http://localhost:8000`.
 
@@ -106,3 +106,9 @@ Deploy the entire monorepo with one click on Vercel:
 1. Connect this repository to Vercel.
 2. The `vercel.json` config will automatically build the React assets and map `/api/*` to the Python serverless function at `/api/index.py`.
 3. Add the `.env` keys under **Vercel Project Settings > Environment Variables**.
+
+### Option C: Google Cloud Run + Cloud Build
+This repository also includes a Cloud Run-ready container and a `cloudbuild.yaml` pipeline for automated deploys:
+1. Cloud Build builds the Docker image from the repo root.
+2. The container listens on the Cloud Run `PORT` value, so the service can start on `8080` without port mismatches.
+3. Create a Cloud Build trigger on your branch and point it at `cloudbuild.yaml` for CI/CD deploys to the `pulsefeed` service in `asia-south1`.
