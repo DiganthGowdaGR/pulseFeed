@@ -49,7 +49,7 @@ Create a `.env` file inside `pulsefeed/` using the following keys:
 ```ini
 # Firebase Firestore Configuration
 FIRESTORE_PROJECT_ID="your-project-id"
-GOOGLE_APPLICATION_CREDENTIALS="path/to/firestore-credentials.json"
+GOOGLE_APPLICATION_CREDENTIALS="YOUR FILE PATH HERE"
 
 # API keys
 OMDB_API_KEY="your-omdb-key"
@@ -57,11 +57,11 @@ WEATHER_API_KEY="your-openweathermap-key"
 GEMINI_API_KEY="your-gemini-api-key"
 
 # Supabase Waitlist Database (Rest API client)
-SUPABASE_URL="https://your-ref-id.supabase.co"
+SUPABASE_URL="YOUR URL HERE"
 SUPABASE_ANON_KEY="your-anon-public-key"
 
 # Secure Evaluation Gate Access Code
-PULSEFEED_ACCESS_CODE="06091978"
+PULSEFEED_ACCESS_CODE="SECRETE-KEY"
 ACCESS_GATE_MAX_ATTEMPTS=10
 ```
 
